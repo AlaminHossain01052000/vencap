@@ -104,7 +104,7 @@ const Projects = () => {
             <div className="row row-cols-1 row-cols-md-3 g-4">
                 {filteredProjects.map(project => (
                     <div key={project._id} className="col">
-                        <Link to={`/project/${project._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <Link to={`/projectdetail/${project._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                             <Project project={project} />
                         </Link>
                     </div>

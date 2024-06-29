@@ -1,7 +1,11 @@
 
 import PropTypes from 'prop-types';
-const ProjectDetail = ({ project }) => {
-    const { title, description, image, valuation, amount, equity, minimumEquityToBuy, addedDate, minimumReturnDate, ownersEmail } = project;
+import { useParams } from 'react-router-dom';
+const ProjectDetail = () => {
+const {id}=useParams();
+   const project={};
+   console.log(id);
+    const { title, description, image, valuation, amount, equity, minimumEquityToBuy, addedDate, minimumReturnDate, ownersEmail } = project||{};
 
     return (
         <div className="container mt-4">
@@ -13,8 +17,8 @@ const ProjectDetail = ({ project }) => {
                     <h5 className="card-title">{title}</h5>
                     <p className="card-text">{description}</p>
                     <p>
-                        Valuation: ${valuation} <br />
-                        Amount: ${amount} <br />
+                        Valuation: ৳{valuation} <br />
+                        Amount: ৳{amount} <br />
                         Equity: {equity}% <br />
                         Minimum Equity to Buy: {minimumEquityToBuy}% <br />
                         Added Date: {addedDate} <br />

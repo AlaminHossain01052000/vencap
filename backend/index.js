@@ -1,6 +1,5 @@
-
-
 const express = require('express');
+const SSLCommerzPayment = require('sslcommerz-lts')
 const app = express();
 const { MongoClient } = require('mongodb');
 const port = process.env.PORT || 5000;
@@ -11,9 +10,14 @@ require("dotenv").config();
 // middleware
 app.use(cors());
 app.use(express.json());
+//ssl commerz connection
+
+const store_id = `${process.env.SSL_STORE_ID}`
+const store_passwd =  `${process.env.SSL_STORE_PASSWORD}`
+const is_live = false //true for live, false for sandbox
 
 // connecting node js with mongodb
-const uri = `mongodb+srv://vencap:uyHEL5s2VqWIn45i@cluster0.li11u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.li11u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 const client = new MongoClient(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -25,7 +29,7 @@ async function run() {
         await client.connect();
         const projectCollection = client.db("vencap").collection("projects");
         const userCollection = client.db("vencap").collection("users");
-      
+      const rechargeCollection=client.db('vencap').collection("recharges");
 
         
           
@@ -45,6 +49,7 @@ async function run() {
             const result = await projectCollection.findOne(query);
             res.json(result);
         })
+       
         
         // post a new product
         app.post("/projects", async (req, res) => {
@@ -108,13 +113,113 @@ async function run() {
 
         
 
-       
+       //sslcommerz init
+app.post('/recharge', async (req, res) => {
+ 
+    const rechargeInfo=req.body;
+    const newTransactionId=new ObjectId().toString();
+// console.log(rechargeInfo.balance)
+    //sslcommerz init
+
+    const data = {
+        total_amount: parseFloat(rechargeInfo.amount),
+        currency: 'BDT',
+        tran_id: newTransactionId, // use unique tran_id for each api call
+        success_url: `http://localhost:5000/recharge/success/${newTransactionId}`,
+        fail_url: `http://localhost:5000/recharge/fail/${newTransactionId}`,
+        cancel_url: 'http://localhost:3030/cancel',
+        ipn_url: 'http://localhost:3030/ipn',
+        shipping_method: 'Courier',
+        product_name: 'Computer.',
+        product_category: 'Electronic',
+        product_profile: 'general',
+        cus_name: rechargeInfo?.name,
+        cus_email:rechargeInfo?.email,
+        cus_add1: 'Dhaka',
+        cus_add2: 'Dhaka',
+        cus_city: 'Dhaka',
+        cus_state: 'Dhaka',
+        cus_postcode: '1000',
+        cus_country: 'Bangladesh',
+        cus_phone: rechargeInfo?.contact,
+        cus_fax: '01711111111',
+        ship_name: 'Customer Name',
+        ship_add1: 'Dhaka',
+        ship_add2: 'Dhaka',
+        ship_city: 'Dhaka',
+        ship_state: 'Dhaka',
+        ship_postcode: 1000,
+        ship_country: 'Bangladesh',
+    };
+    // console.log(data)
+    const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live)
+    sslcz.init(data).then(apiResponse => {
+        // Redirect the user to payment gateway
+        let GatewayPageURL = apiResponse.GatewayPageURL
+        res.send({url:GatewayPageURL})
+        console.log('Redirecting to: ', GatewayPageURL)
+    });
+    console.log((parseFloat(rechargeInfo.balance) ,parseFloat(rechargeInfo.amount)))
+    app.post('/recharge/success/:tranId',async(req,res)=>{
+        
+        try {
+            const userInfo = {
+                name: rechargeInfo?.name,
+                email: rechargeInfo?.email,
+                contact: rechargeInfo?.contact,
+                balance: (parseFloat(rechargeInfo.balance) + parseFloat(rechargeInfo.amount)),
+            };
+    
+            const newRecharge = await rechargeCollection.insertOne({
+                ...userInfo,
+                amount: rechargeInfo?.amount,
+                rechargeTime: rechargeInfo?.rechargeTime,
+                transactionId: newTransactionId,
+                paymentStatus: 'paid'
+            });
+            // console.log((parseFloat(rechargeInfo.balance)+parseFloat(rechargeInfo.amount)))
+            console.log("Email: ",rechargeInfo.email,"previous balance: ",rechargeInfo.balance,"new-amount: ",rechargeInfo.amount, "balance: ",parseFloat(rechargeInfo.balance)+parseFloat(rechargeInfo.amount) )
+            if (!isNaN(parseFloat(rechargeInfo.balance)+parseFloat(rechargeInfo.amount))) {
+                const updateUserBalance = await userCollection.updateOne(
+                    { email: rechargeInfo.email },
+                    { $set: { balance: parseFloat(parseFloat(rechargeInfo.balance)+parseFloat(rechargeInfo.amount)) } }
+                );
+                console.log(updateUserBalance)
+                if (updateUserBalance.modifiedCount > 0) {
+                    // res.json({ message: "Recharge successful", balance: userInfo.balance });
+                    console.log("User updates successfully")
+                    
+                }
+                else{
+                    console.log("some error")
+                }
+            }
+            else{
+                console.log("Nana error")
+            }
+        } catch (error) {
+            console.log("Error while processing recharge:", error.message);
+            // res.status(500).json({ message: "Error while processing recharge" });
+        }
+        finally{
+            res.redirect("http://localhost:5173/my-profile")
+        }
+        
+
+    })
+    app.post('/recharge/fail/:tranId',async(req,res)=>{
+        // console.log(req.params.tranId);
+        console.log("recharge is failed")
+        res.redirect("http://localhost:5173/my-profile")
+    })
+    
+})
 
         
-    }
-    finally {
+}
+finally {
 
-    }
+}
 }
 run().catch(console.dir);
 

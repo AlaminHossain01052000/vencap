@@ -1,6 +1,7 @@
 import { getAuth, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, signInWithEmailAndPassword, getIdToken } from "firebase/auth";
 import { useEffect, useState } from "react";
 import initializeFirebase from "../utilities/firebase.init";
+import axios from "axios";
 
 
 initializeFirebase();
@@ -14,14 +15,12 @@ const useFirebase = () => {
    
     const registerNewUser =async (userInfo, navigate) => {
         setLoading(true);
-        const {name,email,password}=userInfo||{}
+        const {email,password}=userInfo||{}
         await createUserWithEmailAndPassword(auth, email, password)
             .then(() => {
                 // const newUser = { name: name, email: userInfo.email };
                 setUser(user);
-                updateProfile(auth.currentUser, {
-                    name:name
-                }).then(() => {
+                updateProfile(auth.currentUser).then(() => {
                     // Set User Display Name
 
                 }).catch((error) => {
@@ -30,14 +29,7 @@ const useFirebase = () => {
 
                 });
 
-                // fetch("http://localhost:5000/users", {
-                //     method: "PUT",
-                //     headers: {
-                //         "content-type": "application/json"
-                //     },
-                //     body: JSON.stringify(userInfo)
-                // })
-                //     .then()
+                axios.post('http://localhost:5000/users', {...userInfo,balance:0})
                 setLoading(false)
                 navigate("/");
             })

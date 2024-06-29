@@ -4,6 +4,10 @@ import PropTypes from 'prop-types';
 const Project = ({ project }) => {
     const { title, amount, equity, image, valuation } = project;
 
+    // const handleNavigateToProjectDetailPage=()=>{
+
+    //     navigate(`/projectdetail/৳{_id}`);
+    // }
     return (
         <div className="card">
             {/* Project image */}
@@ -13,9 +17,9 @@ const Project = ({ project }) => {
                 <h5 className="card-title">{title}</h5>
                 <p className="card-text">
                     {/* Amount, Equity, Valuation */}
-                    Amount: ${amount} <br />
+                    Amount: ৳{amount} <br />
                     Equity: {equity}% <br />
-                    Valuation: ${valuation}
+                    Valuation: ৳{valuation}
                 </p>
             </div>
         </div>
@@ -24,6 +28,8 @@ const Project = ({ project }) => {
 
 Project.propTypes = {
     project: PropTypes.shape({
+
+        _id:PropTypes.string.isRequired,
         title: PropTypes.string.isRequired,
         amount: PropTypes.number.isRequired,
         equity: PropTypes.number.isRequired,
