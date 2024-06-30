@@ -7,7 +7,7 @@ import HomeProjects from "./HomeProjects";
 
 const Home = () => {
     return (
-        <div>
+        <div style={{background:'#FFFFFF'}}>
             <HomeNavbar1/>
             {/* <HomeNavbar2/> */}
             <HomeBanner/>

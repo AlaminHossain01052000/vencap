@@ -1,0 +1,8 @@
+.home-project-card-image{
+    /* width: 75%; */
+    height: 100%;
+    /* border-radius: 50%; */
+}
+.card:hover{
+    cursor: pointer;
+}

@@ -2,7 +2,7 @@ import  { useState, useEffect } from 'react';
 import axios from 'axios';
 import {  useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
-
+import './HomeProjects.css'
 const HomeProjects = () => {
     const [projects, setProjects] = useState([]);
     const navigate = useNavigate();
@@ -35,14 +35,15 @@ const HomeProjects = () => {
 
     return (
         <Container>
+            <h1 className="text-center mb-5" style={{color:'#001140'}}>Projects</h1>
             <Row>
                 {projects?.map((project) => (
                     <Col key={project?._id} md={4} className="mb-4">
-                        <Card onClick={() => handleCardClick(project?._id)} className="h-100">
-                            <Card.Img variant="top" src={`data:image/png;base64,${project?.image}`} alt={project?.title} />
+                        <Card onClick={() => handleCardClick(project?._id)} className="h-100" style={{background:'#FBFDF5'}}>
+                            <Card.Img variant="top" src={`data:image/png;base64,${project?.image}`} alt={project?.title} className="home-project-card-image mb-5" />
                             <Card.Body>
-                                <Card.Title>{project?.title}</Card.Title>
-                                <Card.Text>
+                                <Card.Title className="fw-bold text-center" style={{color:'#001140'}}>{project?.title}</Card.Title>
+                                <Card.Text className="fw-bold" style={{color:'#001140'}}>
                                     Amount: ৳{project?.amount} <br />
                                     Equity: {project?.equity}% <br />
                                     Valuation: ৳{project?.valuation}
