@@ -13,6 +13,7 @@ const {user}=useAuth();
         axios.get('http://localhost:5000/projects')
             .then(response => {
                 setProjects(response?.data?.filter(project=>project?.ownersInfo?.email!==user?.email));
+            //    (projects.map(project=>project?.investorsInfo?.map(investor=>console.log(investor))))
             })
             .catch(error => {
                 console.error("There was an error fetching the projects!", error);
@@ -52,11 +53,12 @@ const {user}=useAuth();
                                 <td>{project?.valuation}</td>
                                 <td>{project?.equity}</td>
                                 <td>
-                                    <ul>
+                                    {project?.investorsInfo?.map((investor,index)=><li key={index}>{investor.email}</li>)}
+                                    {/* <ul>
                                        {
-                                        project?.investors?.map((investor,id)=>{<li key={id}>{investor}</li>})
+                                        project.investorsInfo?.map((investor,id)=>{<li key={id}>{investor.email}</li>})
                                        }
-                                    </ul>
+                                    </ul> */}
 
                                 </td>
                                 <td>
