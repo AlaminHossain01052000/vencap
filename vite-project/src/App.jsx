@@ -30,7 +30,7 @@ function App() {
           <Route path='/login' Component={Login} />
           <Route path='/signup' Component={Signup} />
         </Routes>
-      </BrowserRouter>s
+      </BrowserRouter>
     </AuthProvider>
       
 

@@ -7,10 +7,10 @@ import pf from '../utilities/pf';
 const MyInvestments = () => {
 
     const {user}=useAuth();
-    const [userProfile,setUserProfile]=useState({});
+    const [myinvests,setMyInvests]=useState([]);
     useEffect(() => {
         // Fetching project data for each investment
-        axios.get(`http://localhost:5000/users/single?email=${user?.email}`).then(res=>setUserProfile(res?.data))
+        axios.get(`http://localhost:5000/users/single?email=${user?.email}`).then(res=>setMyInvests(res?.data?.myinvests))
         // const fetchProjectsData = async () => {
         //     try {
         //         const projectDataPromises = user.myinvests.map(async (investment) => {
@@ -30,6 +30,10 @@ const MyInvestments = () => {
     return pf(a*100)/pf(e);
 } 
     return (
+        
+        myinvests?.length===0?
+        <h1 className='mt-4 text-center'>You does not have any investments</h1>
+        :
         <div className="container mt-4">
             <h2>My Investments</h2>
             <Table striped bordered hover responsive>
@@ -44,7 +48,7 @@ const MyInvestments = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {userProfile?.myinvests?.map((project, index) => (
+                    {myinvests?.map((project, index) => (
                         <tr key={project?._id}>
                             <td>{index + 1}</td>
                             <td>{project?.title}</td>
@@ -57,6 +61,8 @@ const MyInvestments = () => {
                 </tbody>
             </Table>
         </div>
+   
+
     );
 };
 

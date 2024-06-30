@@ -12,18 +12,21 @@ const {user}=useAuth();
     useEffect(() => {
         axios.get('http://localhost:5000/projects')
             .then(response => {
-                setProjects(response.data);
+                setProjects(response?.data?.filter(project=>project?.ownersInfo?.email!==user?.email));
             })
             .catch(error => {
                 console.error("There was an error fetching the projects!", error);
             });
-    }, []);
+    }, [projects,user]);
 
     const handleDetailsClick = (projectId) => {
         navigate(`/projectdetail/${projectId}`);
     };
 
     return (
+        projects?.length===0?
+        <h1 className='text-center mt-5'>There is no project</h1>
+        :
         <div className="container mt-5">
             <h2 className="mb-4">My Projects</h2>
             <div className="table-responsive">
@@ -41,7 +44,7 @@ const {user}=useAuth();
                     </thead>
                     <tbody>
                         {projects.map((project, index) => (
-                            project?.ownersInfo?.email===user?.email&&
+                            
                             <tr key={project?.id}>
                                 <td>{index + 1}</td>
                                 <td>{project?.title}</td>
