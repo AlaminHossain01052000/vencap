@@ -1,10 +1,13 @@
 import  { useEffect, useState } from 'react';
 import axios from 'axios';
 import {  useNavigate } from 'react-router-dom';
+import useAuth from '../hooks/useAuth';
 
 const MyProjects = () => {
     const [projects, setProjects] = useState([]);
     const navigate = useNavigate();
+const {user}=useAuth();
+
 
     useEffect(() => {
         axios.get('http://localhost:5000/projects')
@@ -38,6 +41,7 @@ const MyProjects = () => {
                     </thead>
                     <tbody>
                         {projects.map((project, index) => (
+                            project?.ownersInfo?.email===user?.email&&
                             <tr key={project?.id}>
                                 <td>{index + 1}</td>
                                 <td>{project?.title}</td>

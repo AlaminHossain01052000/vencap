@@ -25,7 +25,10 @@ const navigate=useNavigate();
   };
 
   const handleFileChange = (e) => {
-    setFormData({ ...formData, photo: e.target.files[0] });
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, photo: file });
+    }
   };
 
   const handleSubmit = (e) => {
@@ -46,10 +49,24 @@ const navigate=useNavigate();
       // Add photo generation logic using name if photo is empty
       if (!formData.photo) {
         formData.photo = `https://ui-avatars.com/api/?name=${formData.name}`;
-      }
-      formData.date=new Date()
-      console.log(formData)
+        formData.date=new Date()
+      // console.log(formData)
+
       registerNewUser(formData,navigate);
+
+      }
+      else{
+        const reader = new FileReader();
+        reader.readAsDataURL(formData?.photo);
+        reader.onloadend = async () => {
+          const base64Image = reader.result.split(',')[1];
+          formData.photo=base64Image;
+          formData.date=new Date()
+          registerNewUser(formData,navigate);
+        }
+
+      }
+      
     }
   };
 

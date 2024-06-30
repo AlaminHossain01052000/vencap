@@ -1,8 +1,15 @@
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const HomeNavbar1 = () => {
+  const [userPhoto,setUserPhoto]=useState('');
   const {logoutUser,user}=useAuth();
+  useEffect(()=>{
+    axios.get(`http://localhost:5000/users/single?email=${user?.email}`).then(res=>setUserPhoto(res?.data?.photo))
+  },[user])
+  
   // console.log(user)
   const handleLogginOut=()=>{
     // console.log("out")
@@ -25,7 +32,7 @@ const HomeNavbar1 = () => {
           <Link className="nav-link" to="/my-projects">My Projects</Link>
         </li>
         <li className="nav-item">
-          <Link className="nav-link" to="/projects">My Investments</Link>
+          <Link className="nav-link" to="/my-investments">My Investments</Link>
         </li>
         <li className="nav-item">
           <Link className="nav-link" to="/projects">Explore Projects</Link>
@@ -35,7 +42,7 @@ const HomeNavbar1 = () => {
         user?.uid?
         <li className="nav-item dropdown">
           <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            User Image
+            <img src={`data:image/png;base64,${userPhoto}`}alt="user-photo" width={15} />
           </a>
           
             <ul className="dropdown-menu">

@@ -45,6 +45,7 @@ async function run() {
         // find a project using project id for view in the home or explore page
         app.get("/project/:id", async (req, res) => {
             const id = req.params.id;
+            
             const query = { _id: new ObjectId(id) };
             const result = await projectCollection.findOne(query);
             res.json(result);
@@ -56,7 +57,40 @@ async function run() {
             const newProject = await projectCollection.insertOne(req.body);
             res.json(newProject);
         })
-        // delete a project 
+        
+app.put("/projects", async (req, res) => {
+    try {
+        // console.log(req.body);
+
+        // Construct filter and update objects
+        const filter = { _id:  new ObjectId(req.body.projectId) };
+        const updatedDocument = {
+            equity: req.body.newEquity.toString(), // Ensure equity is a string if needed
+            investorsInfo: req.body.newInvestorsInfo,
+            amount: req.body.newAmount.toString(), // Ensure amount is a string if needed
+            valuation: parseFloat(req.body.newValuation),
+            minimumEquityBuy:req.body.newMinimumEquity.toString()
+        };
+        // console.log(updatedDocument);
+
+        // Perform the update operation
+        const options = { upsert: false };
+        const project = { $set: updatedDocument };
+        const result = await projectCollection.updateOne(filter, project, options);
+        // console.log(result);
+
+        // Check result and send response
+        if (result.modifiedCount === 1) {
+            res.json({ success: true, message: "Project updated successfully" });
+        // } else {
+        //     res.status(404).json({ success: false, message: "Project not found or not updated" });
+        // }
+        }
+    } catch (error) {
+        console.log("Error updating project:", error);
+        // res.status(500).json({ error: "Error updating project" });
+    }
+});        // delete a project 
         app.delete("/projects/:id", async (req, res) => {
             const id = req.params.id;
             const query = { _id:new ObjectId(id) };
@@ -107,6 +141,27 @@ async function run() {
             const filter = { email: req.body.email };
             const options = { upsert: true }
             const user = { $set: req.body };
+            const result = await userCollection.updateOne(filter, user, options);
+            res.json(result);
+        })
+        app.put("/users/investment", async (req, res) => {
+            // console.log(req.body)
+            const filter = { email: req.body.email };
+            const options = { upsert: true }
+            const user = { $set:{
+                myinvests:req.body.myinvests,
+                balance:req.body.userBalance
+            }};
+            const result = await userCollection.updateOne(filter, user, options);
+            res.json(result);
+        })
+        app.put("/users/getinvestment", async (req, res) => {
+            // console.log(req.body)
+            const filter = { email: req.body.email };
+            const options = { upsert: true }
+            const user = { $set:{
+                balance:req.body.newBalance
+            }};
             const result = await userCollection.updateOne(filter, user, options);
             res.json(result);
         })

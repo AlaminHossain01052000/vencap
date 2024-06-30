@@ -81,10 +81,24 @@ const AddNewProject = () => {
    };
 
    try {
-     const response = await axios.post('http://localhost:5000/projects', projectData);
+     await axios.post('http://localhost:5000/projects', projectData);
      setSuccess('Project added successfully!');
      setError('');
-     console.log(response.data);
+    //  console.log(response.data);
+    setFormData({
+      title: '',
+      description: '',
+      minimumReturnDate: '',
+      equity: 0,
+      amount: 0,
+      valuation: 0,
+      minimumEquityBuy: 0,
+      ownersInfo: {},
+      investorsInfo: [],
+      category: '',
+      image:null,
+      additionTime: ''
+    })
    } catch (error) {
      console.error('Error adding project:', error);
      setError('Error adding project. Please try again.');
@@ -194,7 +208,7 @@ const AddNewProject = () => {
             className="form-control"
             id="images"
             name="images"
-            multiple
+            
             onChange={handleFileChange}
           />
         </div>

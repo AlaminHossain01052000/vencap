@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import useAuth from '../hooks/useAuth';
+import HomeNavbar1 from './HomeNavbar1';
 
 const MyProfile = () => {
     const [profile, setProfile] = useState({});
@@ -28,11 +29,12 @@ const MyProfile = () => {
     
     const handleRecharge = async() => {
         // Add logic for recharging using SSLCommerz
+        console.log(profile)
         if(amount<=0){
             alert("Please Enter a valid amount to reacharge");
             return;
         }
-        if(!profile?.email||!profile?.balance){
+        if(profile?.email?.length===0){
             alert("User Email is missing. Please try after some times");
             return;
         }
@@ -54,6 +56,8 @@ const MyProfile = () => {
     
 
     return (
+        <>
+        <HomeNavbar1/>
         <div className="container mt-5">
             <h2 className="mb-4">My Profile</h2>
             <div className="card">
@@ -83,6 +87,8 @@ const MyProfile = () => {
                 </div>
             </div>
         </div>
+        </>
+        
     );
 };
 

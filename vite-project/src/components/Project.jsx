@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 const Project = ({ project }) => {
     const { title, amount, equity, image, valuation } = project;
-
+// console.log(image)
     // const handleNavigateToProjectDetailPage=()=>{
 
     //     navigate(`/projectdetail/৳{_id}`);
@@ -11,7 +11,7 @@ const Project = ({ project }) => {
     return (
         <div className="card">
             {/* Project image */}
-            <img src={image} className="card-img-top" alt={title} />
+            <img src={`data:image/png;base64,${image}`} className="card-img-top" height={400} alt={title} />
             <div className="card-body">
                 {/* Project title */}
                 <h5 className="card-title">{title}</h5>
