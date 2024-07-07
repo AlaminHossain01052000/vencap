@@ -1,0 +1,47 @@
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+     /* Adjust this value based on your layout requirements */
+}
+
+.swipe-right-button-a{
+    display: block;
+    width: 200px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 18px;
+    font-family: sans-serif;
+    text-decoration: none;
+    color: #333;
+    border: 2px solid #333;
+    letter-spacing: 2px;
+    text-align: center;
+    position: relative;
+    transition: all .35s;
+    cursor: pointer;
+  }
+  
+  .swipe-right-button-a span{
+    position: relative;
+    z-index: 2;
+  }
+  
+  .swipe-right-button-a:after{
+    position: absolute;
+    content: "";
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: rgba(0,0,0,1);
+    transition: all .35s;
+  }
+  
+  a.swipe-right-button-a:hover{
+    color: #fff;
+  }
+  
+  .swipe-right-button-a:hover:after{
+    width: 100%;
+  }

@@ -24,6 +24,7 @@ const client = new MongoClient(uri, {
     connectTimeoutMS: 60000, // Adjust the timeout values as needed
     socketTimeoutMS: 60000,
   });
+  const hex = /[0-9A-Fa-f]{6}/g;
 async function run() {
     try {
         await client.connect();
@@ -31,7 +32,7 @@ async function run() {
         const userCollection = client.db("vencap").collection("users");
       const rechargeCollection=client.db('vencap').collection("recharges");
 
-        
+        const withdrawCollection=client.db('vencap').collection("withdraw")
           
           
         
@@ -46,7 +47,7 @@ async function run() {
         app.get("/project/:id", async (req, res) => {
             const id = req.params.id;
             
-            const query = { _id: new ObjectId(id) };
+            const query = { _id:hex.test(id)? new ObjectId(id):id };;
             const result = await projectCollection.findOne(query);
             res.json(result);
         })
@@ -93,7 +94,7 @@ app.put("/projects", async (req, res) => {
 });        // delete a project 
         app.delete("/projects/:id", async (req, res) => {
             const id = req.params.id;
-            const query = { _id:new ObjectId(id) };
+            const query = { _id:hex.test(id)? new ObjectId(id):id };
             const deletedProject = await projectCollection.deleteOne(query);
             res.json(deletedProject);
         })
@@ -166,7 +167,117 @@ app.put("/projects", async (req, res) => {
             res.json(result);
         })
 
+        app.delete("/users/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id:hex.test(id)? new ObjectId(id):id };
+            const deletedUser = await userCollection.deleteOne(query);
+            console.log(deletedUser)
+            res.json(deletedUser);
+        })
+        //ssl commerz withdraw
+        app.post('/withdraw', async (req, res) => {
+ 
+            const withdrawInfo=req.body;
+            const newTransactionId=new ObjectId().toString();
+        console.log(withdrawInfo)
+
+            //sslcommerz init
+        // withdrawInfo.balance=(withdrawInfo?.balance===null||withdrawInfo?.balance===undefined)?0:withdrawInfo.balance
+            const data = {
+                total_amount: parseFloat(withdrawInfo.amount),
+                currency: 'BDT',
+                tran_id: newTransactionId, // use unique tran_id for each api call
+                success_url: `http://localhost:5000/withdraw/success/${newTransactionId}`,
+                fail_url: `http://localhost:5000/withdraw/fail/${newTransactionId}`,
+                cancel_url: 'http://localhost:3030/cancel',
+                ipn_url: 'http://localhost:3030/ipn',
+                shipping_method: 'Courier',
+                product_name: 'Computer.',
+                product_category: 'Electronic',
+                product_profile: 'general',
+                cus_name: withdrawInfo?.name,
+                cus_email:withdrawInfo?.email,
+                cus_add1: 'Dhaka',
+                cus_add2: 'Dhaka',
+                cus_city: 'Dhaka',
+                cus_state: 'Dhaka',
+                cus_postcode: '1000',
+                cus_country: 'Bangladesh',
+                cus_phone: withdrawInfo?.contact,
+                cus_fax: '01711111111',
+                ship_name: 'Customer Name',
+                ship_add1: 'Dhaka',
+                ship_add2: 'Dhaka',
+                ship_city: 'Dhaka',
+                ship_state: 'Dhaka',
+                ship_postcode: 1000,
+                ship_country: 'Bangladesh',
+            };
+            // console.log(data)
+            const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live)
+            sslcz.init(data).then(apiResponse => {
+                // Redirect the user to payment gateway
+                let GatewayPageURL = apiResponse.GatewayPageURL
+                res.send({url:GatewayPageURL})
+                console.log('Redirecting to: ', GatewayPageURL)
+            });
+            // console.log((parseFloat(rechargeInfo.balance) ,parseFloat(rechargeInfo.amount)))
+            app.post('/withdraw/success/:tranId',async(req,res)=>{
+                
+                try {
+                    const userInfo = {
+                        name: withdrawInfo?.name,
+                        email: withdrawInfo?.email,
+                        contact: withdrawInfo?.contact,
+                        balance: withdrawInfo?.newBalance,
+                    };
+            
+                    const newWithDraw = await withdrawCollection.insertOne({
+                        ...userInfo,
+                        amount: withdrawInfo?.amount,
+                        withdrawTime: new Date().toISOString(),
+                        transactionId: newTransactionId,
+                        paymentStatus: 'paid'
+                    });
+                    // console.log((parseFloat(rechargeInfo.balance)+parseFloat(rechargeInfo.amount)))
+                    console.log( parseFloat(parseFloat(withdrawInfo.balance),parseFloat(withdrawInfo.amount)) )
+                  
+                        const updateUserBalance = await userCollection.updateOne(
+                            { email: withdrawInfo.email },
+                            { $set: { balance: withdrawInfo.newBalance} }
+                        );
+                        // console.log(updateUserBalance)
+                        if (updateUserBalance.modifiedCount > 0) {
+                            // res.json({ message: "Recharge successful", balance: userInfo.balance });
+                            console.log("User updates successfully")
+                            
+                        }
+                        else{
+                            console.log("some error")
+                        }
+                    
+                    
+                } catch (error) {
+                    console.log("Error while processing recharge:", error.message);
+                    // res.status(500).json({ message: "Error while processing recharge" });
+                }
+                finally{
+                    res.redirect("http://localhost:5173/my-profile")
+                }
+                
         
+            })
+            app.post('/withdraw/fail/:tranId',async(req,res)=>{
+                // console.log(req.params.tranId);
+                console.log("withdraw is failed")
+                res.redirect("http://localhost:5173/my-profile")
+            })
+        
+            
+            
+            
+        })
+    
 
        //sslcommerz init
 app.post('/recharge', async (req, res) => {
@@ -175,7 +286,7 @@ app.post('/recharge', async (req, res) => {
     const newTransactionId=new ObjectId().toString();
 // console.log(rechargeInfo.balance)
     //sslcommerz init
-
+rechargeInfo.balance=(rechargeInfo?.balance===null||rechargeInfo?.balance===undefined)?0:rechargeInfo.balance
     const data = {
         total_amount: parseFloat(rechargeInfo.amount),
         currency: 'BDT',
@@ -222,7 +333,7 @@ app.post('/recharge', async (req, res) => {
                 name: rechargeInfo?.name,
                 email: rechargeInfo?.email,
                 contact: rechargeInfo?.contact,
-                balance: (parseFloat(rechargeInfo.balance) + parseFloat(rechargeInfo.amount)),
+                balance: (parseFloat(rechargeInfo.balance===null?0:rechargeInfo.balance) + parseFloat(rechargeInfo.amount)),
             };
     
             const newRecharge = await rechargeCollection.insertOne({
@@ -267,6 +378,9 @@ app.post('/recharge', async (req, res) => {
         console.log("recharge is failed")
         res.redirect("http://localhost:5173/my-profile")
     })
+
+    
+    
     
 })
 

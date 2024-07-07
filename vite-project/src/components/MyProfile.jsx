@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import useAuth from '../hooks/useAuth';
-import HomeNavbar1 from './HomeNavbar1';
+
+import EachPageBanner from '../utilities/EachPageBanner';
+import pf from '../utilities/pf';
+import  emailjs  from '@emailjs/browser';
+import { currencyFormatter } from '../utilities/others';
+
+
 
 const MyProfile = () => {
     const [profile, setProfile] = useState({});
@@ -20,16 +26,94 @@ const MyProfile = () => {
             .catch(error => {
                 console.error("There was an error fetching the profile data!", error);
             });
-    }, [user]);
-
-    const handleWithdraw = () => {
+            emailjs.init("ExZoup8ZCGDP-bVZk");
+    }, [user,profile]);
+    const sendEmail = () => {
+        console.log(profile.name,profile.email)
+        emailjs.send("service_f29mwnq", "template_othd4tm", {
+          // Replace with your template parameters
+          to_name: profile.name,
+          to_email: profile.email,
+          message: `You Recharge of ${currencyFormatter.format(pf(amount))} is sucessfully done`,
+          from_name:'vencap'
+          // ...other details
+        })
+        .then((response) => {
+          console.log("Email sent successfully!", response);
+          // Handle successful email sending, e.g., display a success message
+        })
+        .catch((error) => {
+          console.error("Failed to send email:", error);
+          // Handle email sending error, e.g., display an error message
+        });
+      };
+    const sendEmail2 = () => {
+        // console.log(profile.name,profile.email)
+        try {
+            emailjs.send("service_f29mwnq", "template_r47mnrf", {
+                // Replace with your template parameters
+                to_name: profile.name,
+                to_email: profile.email,
+                message: `Your withdrawal of ${currencyFormatter.format(pf(amount))} is sucessfully done`,
+                from_name:'vencap'
+                // ...other details
+              })
+              .then((response) => {
+                console.log("Email sent successfully!", response);
+                // Handle successful email sending, e.g., display a success message
+              })
+              .catch((error) => {
+                console.error("Failed to send email:", error);
+                // Handle email sending error, e.g., display an error message
+              });
+        } catch (error) {
+            console.log(error)
+        }
+       
+      };
+    const handleWithdraw=async () => {
+        console.log(profile.balance)
+        if(!profile?.email){
+            alert("Something Went Wrong. Try Again Letter")
+            return
+        }
         // Add logic for withdrawing using SSLCommerz
-        console.log('Withdraw clicked');
+        if(profile?.balance===null||profile?.balance===undefined||parseFloat(profile.balance)<pf(amount)){
+            alert("Insufficient Balance")
+            return
+        }
+        const confirm=window.confirm(`Are you sure want to withdraw BDT ${amount}`)
+        if(!confirm)return
+        try {
+            var withdrawUrl=""
+            await axios.post("http://localhost:5000/withdraw",
+                {
+                    name:profile.name,
+                    email:profile.email,
+                    contact:profile.contact,
+                    amount,
+                    balance:pf(profile.balance),
+                    newBalance:pf(profile.balance)-pf(amount)
+                }
+                
+            
+            ).then(responseUrl=>{
+                withdrawUrl=responseUrl.data.url
+                sendEmail2()
+                
+            })
+
+        } catch (error) {
+            console.log(error)
+        }
+        finally{
+            window.location.replace(withdrawUrl);
+        }
     };
     
     const handleRecharge = async() => {
         // Add logic for recharging using SSLCommerz
-        console.log(profile)
+        // console.log(profile)
         if(amount<=0){
             alert("Please Enter a valid amount to reacharge");
             return;
@@ -40,12 +124,29 @@ const MyProfile = () => {
         }
         const res=window.confirm(`Are you sure want to recharge ৳${amount}`)
         if(res){
-            const rechargeResponse=await axios.post("http://localhost:5000/recharge",{...profile,amount:amount,rechargeTime:new Date().toISOString()}).then(responseUrl=>{
-                // console.log(responseUrl.data) //{responseUrl.data={url:<the habijabi url>}}
-                window.location.replace(responseUrl.data.url);
-                // window.location.reload()
-            })
-            console.log("Recharge Response",rechargeResponse.json())
+            try{
+                var rechargeUrl="";
+                await axios.post("http://localhost:5000/recharge",{...profile,amount:amount,rechargeTime:new Date().toISOString()}).then(responseUrl=>{
+                
+                    rechargeUrl=responseUrl.data.url
+                    
+              
+                    
+                })
+                sendEmail()
+
+
+                // console.log(rechargeResponse)
+                
+            }
+            catch(error){
+                console.log("Recharge Response",error)
+
+            }
+            finally{
+                window.location.replace(rechargeUrl);
+
+            }
             // console.log(response)
             // console.log(responseUrl)
         }
@@ -57,36 +158,46 @@ const MyProfile = () => {
 
     return (
         <>
-        <HomeNavbar1/>
-        <div className="container mt-5">
-            <h2 className="mb-4">My Profile</h2>
-            <div className="card">
+        
+
+        <EachPageBanner content='My Profile'/>
+        <div className="container mt-5 mb-5">
+            
+            <div className="card py-5">
                 <div className="card-body">
-                    <div className="row">
+                    <div className="row  d-flex align-items-center flex-row">
                         <div className="col-md-3">
-                            <img src={profile?.photo} alt="User Photo" className="img-fluid rounded-circle" />
+                            <img src={profile?.photo === undefined ? `https://ui-avatars.com/api/?name=${profile?.name}` : `data:image/png;base64,${profile.photo}`}  alt="User Photo" className="img-fluid rounded-circle" />
                         </div>
                         <div className="col-md-9">
-                            <h4 className="card-title">{profile?.name}</h4>
+                            <h3 className="card-title">{profile?.name}</h3>
                             <p className="card-text"><strong>Email:</strong> {profile?.email}</p>
                             <p className="card-text"><strong>Contact No:</strong> {profile?.contact}</p>
-                            <p className="card-text"><strong>Balance:</strong> {profile?.balance}</p>
-                            
-                            <div>
-                                <input type='number' value={amount} onChange={(e)=>setAmount(e.target.value)}/>
-                            </div>
+                            <p className="card-text"><strong>Balance:</strong> {profile?.balance===null||profile?.balance===undefined?0:profile.balance}</p>
+                            <div className='d-flex flex-column'>
+                                <div className='w-25'>
+                                    <input 
+                                    type='number' 
+                                    value={amount} 
+                                    onChange={(e)=>setAmount(e.target.value)}
+                                    className='w-100'
+                                    />
+                                </div>
 
-                            
-                            <div className='w-50  d-flex  justify-content-between'>   
-                            <button className="btn btn-primary me-2" onClick={handleWithdraw}>Withdraw</button>
-                            <button className="btn btn-success" onClick={handleRecharge}>Recharge</button>
+                                
+                                <div className='w-25 d-flex  flex-column justify-content-between mt-4'>   
+                                <button className="btn btn-primary mb-3" onClick={handleWithdraw}>Withdraw</button>
+                                <button className="btn btn-success" onClick={handleRecharge}>Recharge</button>
+                                </div>
                             </div>
+                            
                             
                         </div>
-                    </div>n
+                    </div>
                 </div>
             </div>
         </div>
+        {/* <Footer/> */}
         </>
         
     );

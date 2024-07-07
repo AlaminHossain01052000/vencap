@@ -1,0 +1,7 @@
+.each-page-banner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px; /* Adjust this value based on your layout requirements */
+    background-color: #F6F6F6;
+}

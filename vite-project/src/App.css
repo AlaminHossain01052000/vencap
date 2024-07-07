@@ -1,7 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Bona+Nova+SC:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+h1,h2,h3,h4,h5,h6,p,a,span,strong,li,ul,.h5,button,input,label,th,td{
+    /* font-family: "Roboto", sans-serif; */
+    /* font-family: "Bona Nova SC", serif; */
+    font-family: "Poppins", sans-serif;
 
-h1,h2,h3,h4,h5,h6,p,a,span,strong,li,ul,.h5,button{
-    font-family: "Roboto", sans-serif;
   /* font-weight: 400; */
   font-style: normal;
+}
+.styled-hr {
+  width: 50%;
+  border: 0;
+  border-top: 3px solid #333;
+  margin: 0 auto;
+  position: relative;
+  top: -15px;
+  background: linear-gradient(to right, #ff7e5f, #feb47b);
+  height: 3px;
 }

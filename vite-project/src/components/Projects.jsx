@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Project from './Project';
-import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types'
+import EachPageBanner from '../utilities/EachPageBanner';
+import PropTypes from 'prop-types';
 
-
-
-const Projects = () => {
+const Projects = ({ userEmail }) => {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -54,69 +52,90 @@ const Projects = () => {
 
     const handleCategoryChange = e => {
         setSelectedCategory(e.target.value);
+        updateUserInterests(userEmail, e.target.value);
+    };
+
+    const handleSearchTermChange = e => {
+        setSearchTerm(e.target.value);
+    };
+
+    const updateUserInterests = (email, category) => {
+        const userInterests = JSON.parse(localStorage.getItem('userInterests')) || {};
+        if (category) {
+            userInterests[email] = userInterests[email] || {};
+            userInterests[email][category] = (userInterests[email][category] || 0) + 1;
+            localStorage.setItem('userInterests', JSON.stringify(userInterests));
+        }
+    };
+
+    const handleSearch = () => {
+        const searchCriteria = {
+            email: userEmail,
+            searchTerm,
+            selectedCategory
+        };
+        localStorage.setItem('searchCriteria', JSON.stringify(searchCriteria));
     };
 
     if (loading) return <h2>Loading...</h2>;
     if (error) return <h2>Error: {error}</h2>;
 
     return (
-        <div className="container mt-5">
-            <div className="row mb-3">
-                <div className="col-md-6">
-                    <h2>Projects</h2>
-                </div>
-                <div className="col-md-6">
-                    <div className="d-flex">
-                        <input
-                            type="text"
-                            className="form-control me-2"
-                            placeholder="Search by title"
-                            value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
-                        />
-                        <select
-                            className="form-select me-2"
-                            aria-label="Sort by valuation"
-                            value={sortByValuation}
-                            onChange={handleSortByValuationChange}
-                        >
-                            <option value="Default">Default (Latest First)</option>
-                            <option value="Low to High">Low to High</option>
-                            <option value="High to Low">High to Low</option>
-                        </select>
-                        <select
-                            className="form-select"
-                            aria-label="Filter by category"
-                            value={selectedCategory}
-                            onChange={handleCategoryChange}
-                        >
-                            <option value="">All Categories</option>
-                            <option value="Agriculture">Agriculture</option>
-                            <option value="Technology">Technology</option>
-                            <option value="Healthcare">Healthcare</option>
-                            <option value="Finance">Finance</option>
-                            <option value="Real State">Real State</option>
-                            <option value="Others">Others</option>
-                        </select>
+        <div>
+            <EachPageBanner content='Projects' />
+            <div className="container py-5">
+                <div className="row mb-3">
+                    <div className="col-md-6">
+                        <div className="d-flex">
+                            <input
+                                type="text"
+                                className="form-control me-2"
+                                placeholder="Search by title"
+                                value={searchTerm}
+                                onChange={handleSearchTermChange}
+                            />
+                            <select
+                                className="form-select me-2"
+                                aria-label="Sort by valuation"
+                                value={sortByValuation}
+                                onChange={handleSortByValuationChange}
+                            >
+                                <option value="Default">Default (Latest First)</option>
+                                <option value="Low to High">Low to High</option>
+                                <option value="High to Low">High to Low</option>
+                            </select>
+                            <select
+                                className="form-select"
+                                aria-label="Filter by category"
+                                value={selectedCategory}
+                                onChange={handleCategoryChange}
+                            >
+                                <option value="">All Categories</option>
+                                <option value="Agriculture">Agriculture</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Real State">Real State</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <button onClick={handleSearch} className="btn btn-primary">Search</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div className="row row-cols-1 row-cols-md-3 g-4">
-                {filteredProjects.map(project => (
-                    <div key={project._id} className="col">
-                        <Link to={`/projectdetail/${project._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <div className="row row-cols-1 row-cols-md-3 g-4">
+                    {filteredProjects.map(project => (
+                        <div key={project._id} className="col">
                             <Project project={project} />
-                        </Link>
-                    </div>
-                ))}
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );
 };
 
-
 Projects.propTypes = {
-    children: PropTypes.node.isRequired,
+    userEmail: PropTypes.string.isRequired,
 };
 
 export default Projects;

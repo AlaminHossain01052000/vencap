@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import axios from 'axios';
+import EachPageBanner from '../utilities/EachPageBanner';
 
 const AddNewProject = () => {
   const { user } = useAuth();
@@ -110,110 +111,123 @@ const AddNewProject = () => {
   const categories = ["", "Agriculture", "Technology", "Healthcare", "Finance", "Real State", "Others"];
 
   return (
-    <div className="container mt-5">
-      <h2 className="mb-4">Add New Project</h2>
-      {error && <p className="text-danger">{error}</p>}
-      {success && <p className="text-success">{success}</p>}
-      <form onSubmit={handleSubmit}>
-        <div className="form-group mb-3">
-          <label htmlFor="title">Title</label>
-          <input
-            type="text"
-            className="form-control"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            required
-          />
+    <div>
+      <EachPageBanner content='Add New Project'/>
+      
+      <div className="container mt-5 d-lg-flex align-items-center">
+      
+      
+        <div className='w-50'>
+        {error && <p className="text-danger my-3">{error}</p>}
+        {success && <p className="text-success my-3">{success}</p>}
+        <form onSubmit={handleSubmit} className='mt-5 w-100'>
+          <div className="form-group mb-3">
+            <label style={{color:'#001140'}} htmlFor="title">Title</label>
+            <input
+              type="text"
+              className="form-control"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group mb-3">
+            <label style={{color:'#001140'}} htmlFor="description">Description</label>
+            <textarea
+              className="form-control"
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              required
+            ></textarea>
+          </div>
+          <div className="form-group mb-3">
+            <label style={{color:'#001140'}} htmlFor="minimumReturnDate">Minimum Return Date</label>
+            <input
+              type="date"
+              className="form-control"
+              id="minimumReturnDate"
+              name="minimumReturnDate"
+              value={formData.minimumReturnDate}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group mb-3">
+            <label style={{color:'#001140'}} htmlFor="amount">Amount (৳)</label>
+            <input
+              type="number"
+              className="form-control"
+              id="amount"
+              name="amount"
+              value={formData.amount}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group mb-3">
+            <label style={{color:'#001140'}} htmlFor="equity">Equity (%)</label>
+            <input
+              type="number"
+              className="form-control"
+              id="equity"
+              name="equity"
+              value={formData.equity}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group mb-3">
+            <label style={{color:'#001140'}} htmlFor="minimumEquityBuy">Minimum Equity Buy (%)</label>
+            <input
+              type="number"
+              className="form-control"
+              id="minimumEquityBuy"
+              name="minimumEquityBuy"
+              value={formData.minimumEquityBuy}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group mb-3">
+            <label style={{color:'#001140'}} htmlFor="category">Category</label>
+            <select
+              className="form-control"
+              id="category"
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              required
+            >
+              {categories.sort().map((category, index) => (
+                <option key={index} value={category}>{category}</option>
+              ))}
+            </select>
+          </div>
+          <div className="form-group mb-3">
+            <label style={{color:'#001140'}} htmlFor="images">Upload Images</label>
+            <input
+              type="file"
+              className="form-control"
+              id="images"
+              name="images"
+              
+              onChange={handleFileChange}
+            />
+          </div>
+          <button type="submit" className="btn btn-primary">Add Project<i className='fas fa-arrow-right ms-3'></i></button>
+        </form>
         </div>
-        <div className="form-group mb-3">
-          <label htmlFor="description">Description</label>
-          <textarea
-            className="form-control"
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            required
-          ></textarea>
+        
+        <div className='w-50'>
+          <img src="../../assets/images/add-project.jpg" alt="add-project" className='w-100'/>
         </div>
-        <div className="form-group mb-3">
-          <label htmlFor="minimumReturnDate">Minimum Return Date</label>
-          <input
-            type="date"
-            className="form-control"
-            id="minimumReturnDate"
-            name="minimumReturnDate"
-            value={formData.minimumReturnDate}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group mb-3">
-          <label htmlFor="amount">Amount (৳)</label>
-          <input
-            type="number"
-            className="form-control"
-            id="amount"
-            name="amount"
-            value={formData.amount}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group mb-3">
-          <label htmlFor="equity">Equity (%)</label>
-          <input
-            type="number"
-            className="form-control"
-            id="equity"
-            name="equity"
-            value={formData.equity}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group mb-3">
-          <label htmlFor="minimumEquityBuy">Minimum Equity Buy (%)</label>
-          <input
-            type="number"
-            className="form-control"
-            id="minimumEquityBuy"
-            name="minimumEquityBuy"
-            value={formData.minimumEquityBuy}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group mb-3">
-          <label htmlFor="category">Category</label>
-          <select
-            className="form-control"
-            id="category"
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            required
-          >
-            {categories.sort().map((category, index) => (
-              <option key={index} value={category}>{category}</option>
-            ))}
-          </select>
-        </div>
-        <div className="form-group mb-3">
-          <label htmlFor="images">Upload Images</label>
-          <input
-            type="file"
-            className="form-control"
-            id="images"
-            name="images"
-            
-            onChange={handleFileChange}
-          />
-        </div>
-        <button type="submit" className="btn btn-primary">Add Project</button>
-      </form>
+      
+      </div>
+      
     </div>
   );
 };

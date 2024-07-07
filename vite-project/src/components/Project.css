@@ -1,19 +1,16 @@
-.home-projects-card-image-container {
+.single-project-card-image-container {
     position: relative;
     width: 100%; /* Ensures the container spans the entire width */
     height: 100%; /* Ensures the container spans the entire height */
     overflow: hidden; /* Ensures the image does not overflow */
     
 }
-
-.home-projects-card-image {
+ .single-project-image{
     width: 100%;
-    height: 100px;
+    
     object-fit: cover;
 }
-
-
-.home-projects-card-body {
+.single-project-card-img-cover {
     position: absolute;
     top: 0;
     left: 0;
@@ -29,7 +26,7 @@
 }
 
 
-.home-projects-card-image-container:hover .home-projects-card-body {
+.single-project-card-image-container:hover .single-project-card-img-cover {
     
     display: flex;
    flex-direction: column;

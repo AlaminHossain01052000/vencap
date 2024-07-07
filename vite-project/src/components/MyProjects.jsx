@@ -3,6 +3,10 @@ import axios from 'axios';
 import {  useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 
+
+import EachPageBanner from '../utilities/EachPageBanner';
+
+
 const MyProjects = () => {
     const [projects, setProjects] = useState([]);
     const navigate = useNavigate();
@@ -25,56 +29,68 @@ const {user}=useAuth();
     };
 
     return (
-        projects?.length===0?
-        <h1 className='text-center mt-5'>There is no project</h1>
-        :
-        <div className="container mt-5">
-            <h2 className="mb-4">My Projects</h2>
-            <div className="table-responsive">
-                <table className="table table-bordered table-hover">
-                    <thead className="thead-dark">
-                        <tr>
-                            <th>No</th>
-                            <th>Project Title</th>
-                            <th>Amount</th>
-                            <th>Valuation</th>
-                            <th>Equity</th>
-                            <th>Investors (Email ID)</th>
-                            <th>Details</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {projects.map((project, index) => (
-                            
-                            <tr key={project?.id}>
-                                <td>{index + 1}</td>
-                                <td>{project?.title}</td>
-                                <td>{project?.amount}</td>
-                                <td>{project?.valuation}</td>
-                                <td>{project?.equity}</td>
-                                <td>
-                                    {project?.investorsInfo?.map((investor,index)=><li key={index}>{investor.email}</li>)}
-                                    {/* <ul>
-                                       {
-                                        project.investorsInfo?.map((investor,id)=>{<li key={id}>{investor.email}</li>})
-                                       }
-                                    </ul> */}
-
-                                </td>
-                                <td>
-                                    <button 
-                                        className="btn btn-primary" 
-                                        onClick={() => handleDetailsClick(project?.id)}
-                                    >
-                                        Details
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+        
+        <div style={{background:`white`,height:'100vh'}} >
+    
+            <EachPageBanner content="My Projects"/>
+            {
+                projects?.length===0?
+                <h1 className='pt-5 text-center'>There is no project</h1>
+                :
+                <div>
+                    
+                    <div className="container pt-5">
+                        
+                        <div className="table-responsive">
+                            <table className="table table-bordered table-hover">
+                                <thead className="thead-dark">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Project Title</th>
+                                        <th>Amount</th>
+                                        <th>Valuation</th>
+                                        <th>Equity</th>
+                                        <th>Investors (Email ID)</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {projects.map((project, index) => (
+                                        
+                                        <tr key={project?.id}>
+                                            <td>{index + 1}</td>
+                                            <td>{project?.title}</td>
+                                            <td>{project?.amount}</td>
+                                            <td>{project?.valuation}</td>
+                                            <td>{project?.equity}</td>
+                                            <td>
+                                                {project?.investorsInfo?.map((investor,index)=><li key={index}>{investor.email}</li>)}
+                                                {/* <ul>
+                                                {
+                                                    project.investorsInfo?.map((investor,id)=>{<li key={id}>{investor.email}</li>})
+                                                }
+                                                </ul> */}
+            
+                                            </td>
+                                            <td>
+                                                <button 
+                                                    className="btn btn-primary" 
+                                                    onClick={() => handleDetailsClick(project?.id)}
+                                                >
+                                                    Details
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+            {/* <Footer/> */}
         </div>
+            
     );
 };
 

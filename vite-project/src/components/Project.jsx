@@ -1,25 +1,39 @@
 
 import PropTypes from 'prop-types';
-
+import './Project.css'
+import { useNavigate } from 'react-router-dom';
+import { currencyFormatter } from '../utilities/others';
 const Project = ({ project }) => {
-    const { title, amount, equity, image, valuation } = project;
+    const { _id,title, amount, equity, image, valuation } = project;
 // console.log(image)
-    // const handleNavigateToProjectDetailPage=()=>{
+const navigate=useNavigate()
+    const handleNavigateToProjectDetailPage=()=>{
 
-    //     navigate(`/projectdetail/৳{_id}`);
-    // }
+        navigate(`/projectdetail/${_id}`);
+    }
+    
     return (
-        <div className="card">
+        <div className="card single-project-card">
             {/* Project image */}
-            <img src={`data:image/png;base64,${image}`} className="card-img-top" height={400} alt={title} />
-            <div className="card-body">
+            <div className='single-project-card-image-container' onClick={handleNavigateToProjectDetailPage}>
+                <img 
+                src={image===undefined?`https://ui-avatars.com/api/?name=${title}`:`data:image/png;base64,${image}`} 
+                className="card-img-top single-project-image" 
+                height={400} 
+                alt={title} />
+                <div className='single-project-card-img-cover'>
+                <i className="fas fa-arrow-circle-right fs-1" style={{color:'white'}}></i>
+                </div>
+            </div>
+            
+            <div className="card-body text-center pt-5 pb-3">
                 {/* Project title */}
                 <h5 className="card-title">{title}</h5>
                 <p className="card-text">
                     {/* Amount, Equity, Valuation */}
-                    Amount: ৳{amount} <br />
-                    Equity: {equity}% <br />
-                    Valuation: ৳{valuation}
+                    Amount:<strong>  {currencyFormatter.format(amount)} </strong><br />
+                    Equity:<strong> {equity} %</strong> <br />
+                    Valuation:<strong> {currencyFormatter.format(valuation)}</strong>
                 </p>
             </div>
         </div>

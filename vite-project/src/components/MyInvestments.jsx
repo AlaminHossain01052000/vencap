@@ -3,6 +3,9 @@ import axios from 'axios';
 import { Table } from 'react-bootstrap';
 import useAuth from '../hooks/useAuth';
 import pf from '../utilities/pf';
+import  { textColor}  from '../utilities/color';
+
+import EachPageBanner from '../utilities/EachPageBanner';
 
 const MyInvestments = () => {
 
@@ -29,13 +32,16 @@ const MyInvestments = () => {
  function valuationCal(e,a) {
     return pf(a*100)/pf(e);
 } 
+console.log(textColor())
     return (
-        
-        myinvests?.length===0?
-        <h1 className='mt-4 text-center'>You does not have any investments</h1>
+        <div style={{background:`white`,height:'100vh'}}>
+            
+            <EachPageBanner content="My Investments"/>
+            {myinvests?.length===0?
+        <h1 className='py-4 text-center'>You does not have any investments</h1>
         :
-        <div className="container mt-4">
-            <h2>My Investments</h2>
+        <div className="container pt-5 mt-5" >
+           
             <Table striped bordered hover responsive>
                 <thead>
                     <tr>
@@ -61,6 +67,10 @@ const MyInvestments = () => {
                 </tbody>
             </Table>
         </div>
+    }
+    {/* <Footer/> */}
+        </div>
+        
    
 
     );

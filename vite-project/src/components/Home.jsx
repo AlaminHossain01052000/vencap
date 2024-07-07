@@ -1,18 +1,20 @@
-import Footer from "./Footer";
+
 import HomeBanner from "./HomeBanner";
-import HomeNavbar1 from "./HomeNavbar1";
+
 import HomeProjects from "./HomeProjects";
+import RecommendedProjects from "./RecommendedProjects";
 
 
 
 const Home = () => {
     return (
-        <div style={{background:'#FFFFFF'}}>
-            <HomeNavbar1/>
-            {/* <HomeNavbar2/> */}
+        <div>
+            
+            
             <HomeBanner/>
+            <RecommendedProjects/>
             <HomeProjects/>
-            <Footer/>
+            
         </div>
     );
 };
