@@ -13,6 +13,7 @@ const MyProfile = () => {
     const [profile, setProfile] = useState({});
     // const [openAmountField,setOpenAmountField]=useState(false);
     const [amount,setAmount]=useState(0);
+    
     // const [prevBalance,setPrevBalance]=useState(0);
     const {user}=useAuth();
     useEffect(() => {
@@ -27,6 +28,7 @@ const MyProfile = () => {
                 console.error("There was an error fetching the profile data!", error);
             });
             emailjs.init("ExZoup8ZCGDP-bVZk");
+         
     }, [user,profile]);
     const sendEmail = () => {
         console.log(profile.name,profile.email)
@@ -122,6 +124,8 @@ const MyProfile = () => {
             alert("User Email is missing. Please try after some times");
             return;
         }
+        
+       
         const res=window.confirm(`Are you sure want to recharge ৳${amount}`)
         if(res){
             try{

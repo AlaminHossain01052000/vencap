@@ -34,7 +34,7 @@ const HomeNavbar1 = () => {
           <Link className="nav-link active" aria-current="page" to="/">Home</Link>
         </li>
         {
-        admin?
+        admin&&user?.email?
         <>
           <li className="nav-item">
         <Link className="nav-link" to="/view-project">View Projects</Link>

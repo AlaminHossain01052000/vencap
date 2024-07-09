@@ -3,13 +3,19 @@ import PropTypes from 'prop-types';
 import './Project.css'
 import { useNavigate } from 'react-router-dom';
 import { currencyFormatter } from '../utilities/others';
+import useAuth from '../hooks/useAuth';
 const Project = ({ project }) => {
     const { _id,title, amount, equity, image, valuation } = project;
 // console.log(image)
+const {user}=useAuth()
 const navigate=useNavigate()
     const handleNavigateToProjectDetailPage=()=>{
-
-        navigate(`/projectdetail/${_id}`);
+       
+            navigate(`/projectdetail/${_id}`);
+        
+        
+        
+       
     }
     
     return (

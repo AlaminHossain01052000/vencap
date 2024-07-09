@@ -3,8 +3,9 @@ import axios from 'axios';
 import Project from './Project';
 import EachPageBanner from '../utilities/EachPageBanner';
 import PropTypes from 'prop-types';
+import useAuth from '../hooks/useAuth';
 
-const Projects = ({ userEmail }) => {
+const Projects = () => {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -12,7 +13,8 @@ const Projects = ({ userEmail }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [sortByValuation, setSortByValuation] = useState('Default');
     const [selectedCategory, setSelectedCategory] = useState('');
-
+    const {user}=useAuth()
+    const [userEmail,setUserEmail]=useState('')
     useEffect(() => {
         const fetchProjects = async () => {
             try {
@@ -26,7 +28,8 @@ const Projects = ({ userEmail }) => {
         };
 
         fetchProjects();
-    }, []);
+        setUserEmail(user?.email)
+    }, [user]);
 
     // Filter projects by search term, category, and sort by valuation
     useEffect(() => {
@@ -61,6 +64,7 @@ const Projects = ({ userEmail }) => {
 
     const updateUserInterests = (email, category) => {
         const userInterests = JSON.parse(localStorage.getItem('userInterests')) || {};
+        
         if (category) {
             userInterests[email] = userInterests[email] || {};
             userInterests[email][category] = (userInterests[email][category] || 0) + 1;
@@ -68,14 +72,7 @@ const Projects = ({ userEmail }) => {
         }
     };
 
-    const handleSearch = () => {
-        const searchCriteria = {
-            email: userEmail,
-            searchTerm,
-            selectedCategory
-        };
-        localStorage.setItem('searchCriteria', JSON.stringify(searchCriteria));
-    };
+    
 
     if (loading) return <h2>Loading...</h2>;
     if (error) return <h2>Error: {error}</h2>;
@@ -118,7 +115,7 @@ const Projects = ({ userEmail }) => {
                                 <option value="Real State">Real State</option>
                                 <option value="Others">Others</option>
                             </select>
-                            <button onClick={handleSearch} className="btn btn-primary">Search</button>
+                            {/* <button onClick={handleSearch} className="btn btn-primary">Search</button> */}
                         </div>
                     </div>
                 </div>

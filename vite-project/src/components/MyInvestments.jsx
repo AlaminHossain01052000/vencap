@@ -32,7 +32,7 @@ const MyInvestments = () => {
  function valuationCal(e,a) {
     return pf(a*100)/pf(e);
 } 
-console.log(textColor())
+// console.log(myinvests)
     return (
         <div style={{background:`white`,height:'100vh'}}>
             

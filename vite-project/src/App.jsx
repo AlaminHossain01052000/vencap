@@ -15,6 +15,7 @@ import Footer from './components/Footer'
 import HomeNavbar1 from './components/HomeNavbar1'
 import ViewProject from './components/ViewProject'
 import ViewUsers from './components/ViewUsers'
+import Chat from './components/Chat'
 
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
           <Route path='/login' Component={Login} />
           <Route path='/signup' Component={Signup} />
         </Routes>
+      <Chat/>
       <Footer/>
       </BrowserRouter>
     </AuthProvider>

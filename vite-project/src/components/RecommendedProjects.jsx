@@ -14,6 +14,7 @@ const RecommendedProjects = () => {
             try {
                 const userInterests = JSON.parse(localStorage.getItem('userInterests')) || {};
                 const userCategories = userInterests[user?.email] || {};
+                // console.log(userCategories)
                 const categoryPreference = Object.keys(userCategories).sort((a, b) => userCategories[b] - userCategories[a]);
 
                 const response = await axios.get('http://localhost:5000/projects');

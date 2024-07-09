@@ -2,7 +2,7 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
-import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
+import {  useLocation, useNavigate, useParams } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 import pf from '../utilities/pf';
 import './ProjectDetail.css'
@@ -21,26 +21,43 @@ const ProjectDetail = () => {
     const [equityValue, setEquityValue] = useState(0);
     const [owner, setOwner] = useState({})
     const [iconClassName, setIconClassName] = useState("")
-    const navigate=useNavigate();
-    const location=useLocation()
+    const [updateLoading, setUpdateLoading] = useState(false)
+
+    const navigate = useNavigate();
+    const location = useLocation()
     //    console.log(id);
     const { title, description, image, valuation, amount, equity, minimumEquityBuy, additionTime, minimumReturnDate, ownersInfo, investorsInfo, category } = project || {};
     // console.log(project)
     useEffect(() => {
-        console.log(id)
-        axios.get(`http://localhost:5000/project/${id}`).then(response => setProject(response.data))
-        axios.get(`http://localhost:5000/users/single?email=${user?.email}`).then(response => setUserProfile(response?.data))
-        axios.get(`http://localhost:5000/users/single?email=${ownersInfo?.email}`).then(response => setOwner(response?.data))
-        setIconClassName(categoryToCorrespondingIcon[category?.toLowerCase()])
-    }, [id, user, ownersInfo, category])
+        const getProjectFunction = async () => {
+            await axios.get(`http://localhost:5000/project/${id}`).then(response => setProject(response.data))
+
+        }
+        const getUserProfileFunction = async () => {
+            
+            await axios.get(`http://localhost:5000/users/single?email=${user?.email}`).then(response => setUserProfile(response?.data))
+        }
+        const getOwnerFunction = async () => {
+            await axios.get(`http://localhost:5000/users/single?email=${ownersInfo?.email}`).then(response => setOwner(response?.data))
+        }
+        const getIconClassNameFunction = () => {
+            setIconClassName(categoryToCorrespondingIcon[category?.toLowerCase()])
+        }
+        if (id && !project?._id||updateLoading)
+            getProjectFunction()
+        if (user?.email && !userProfile?.email)
+            getUserProfileFunction()
+        if (ownersInfo?.email && !owner?.email)
+            getOwnerFunction()
+        if (!iconClassName && category)
+            getIconClassNameFunction()
+        console.log(user?.email,userProfile)
+
+    }, [id, user, ownersInfo, iconClassName, category, owner, userProfile, project,updateLoading])
     const date = new Date(additionTime);
-    const handleGetEquityFunctionalities = () => {
-        // Hey chatgpt perform the actions
-        // 1. It will open a modal
-        // 2. The modal will take input of equity percentage that the investor want to get
-        // 3. If the inputed percentage is greater or equal to minimumEquityBuy and less than or equal to equity then the amount will calculated using the percentage
-        // 4. An update function will be invoke of node js. peform this using axios
-        // 5. Update function will decrease the balance of user.balance and equity percentage of the project
+    const handleGetEquityFunctionalities = async () => {
+
+
         if (!user?.email) {
             const confirm = window.confirm("You have to login first to invest. Do you want to login now?");
             if (confirm) {
@@ -48,7 +65,7 @@ const ProjectDetail = () => {
             }
             return;
         }
-        
+
         if (user?.email === ownersInfo?.email) {
             alert("You can't invest in own project");
             return
@@ -64,56 +81,81 @@ const ProjectDetail = () => {
             const newAmount = (parseFloat(amount) * (parseFloat(equity) - parseFloat(equityValue))) / parseFloat(equity);
             const newValuation = (newAmount * 100) / (newEquity)
             const newMinimumEquity = Math.min(parseFloat(minimumEquityBuy), parseFloat(newEquity));
-            axios.put("http://localhost:5000/projects", {
-                projectId: id,
-                newEquity,
-                newInvestorsInfo: investorsInfo.map(investor => {
-                    if (investor.email === user.email) {
-                        return {
-                            ...investor,
-                            equity: parseFloat(investor.equity) + parseFloat(equityValue)
-                        };
+            try {
+                setUpdateLoading(true)
+                const reponse = await axios.put("http://localhost:5000/projects", {
+                    projectId: id,
+                    newEquity,
+                    newInvestorsInfo: investorsInfo.map(investor => {
+                        if (investor.email === user.email) {
+                            return {
+                                ...investor,
+                                equity: parseFloat(investor.equity) + parseFloat(equityValue)
+                            };
+                        }
+                        return investor;
+                    }).concat(
+                        investorsInfo.some(investor => investor.email === user.email)
+                            ? []
+                            : [{ email: user.email, equity: parseFloat(equityValue) }]
+                    ),
+                    newAmount,
+                    newValuation,
+                    newMinimumEquity
+                })
+                // /users/investment
+                const myinvests = []
+                let paisi=false
+                for (let i = 0; i < userProfile?.myinvests?.length; ++i) {
+                    console.log(userProfile?.myinvests[i]?.projectId,id)
+                    if (userProfile?.myinvests[i]?.projectId === id) {
+                        paisi=true
+                        myinvests.push({
+                            email: user?.email,
+                            projectId: id,
+                            equity: pf(equityValue) + pf(userProfile?.myinvests[i]?.equity),
+                            amount: pf(userHaveToInvest) + pf(userProfile?.myinvests[i]?.amount),
+                            returnDate: minimumReturnDate,
+                            title:title
+                        })
                     }
-                    return investor;
-                }).concat(
-                    investorsInfo.some(investor => investor.email === user.email)
-                        ? []
-                        : [{ email: user.email, equity: parseFloat(equityValue) }]
-                ),
-                newAmount,
-                newValuation,
-                newMinimumEquity
-            })
-            // /users/investment
-            const myinvests = []
-            for (let i = 0; i < userProfile?.myinvests?.length; ++i) {
-                if (userProfile?.myinvests[i]?.projectId === id) {
+                    else myinvests.push(userProfile?.myinvests[i]);
+                }
+                if(!paisi){
                     myinvests.push({
                         email: user?.email,
                         projectId: id,
-                        equity: pf(equityValue) + pf(userProfile?.myinvests[i]?.equity),
-                        amount: pf(userHaveToInvest) + pf(userProfile?.myinvests[i]?.amount),
+                        equity: pf(equityValue) ,
+                        amount: pf(userHaveToInvest),
                         returnDate: minimumReturnDate,
-                        title
+                        title:title
                     })
                 }
-                else myinvests.push(userProfile?.myinvests[i]);
+                // console.log(myinvests?)
+                const userBalance = pf(userProfile?.balance) - pf(userHaveToInvest)
+                if (myinvests.length > 0) {
+                    await axios.put("http://localhost:5000/users/investment", { email: user?.email, myinvests, userBalance })
+
+                }
+                await axios.put("http://localhost:5000/users/getinvestment", { email: owner?.email, newBalance: pf(owner?.balance) + pf(userHaveToInvest) })
+            } catch (error) {
+                setUpdateLoading(false)
+                alert(error.message)
             }
-            const userBalance = pf(userProfile?.balance) - pf(userHaveToInvest)
-            if (myinvests.length > 0) {
-                axios.put("http://localhost:5000/users/investment", { email: user?.email, myinvests, userBalance })
+            finally {
+                setUpdateLoading(false)
 
             }
-            axios.put("http://localhost:5000/users/getinvestment", { email: owner?.email, newBalance: pf(owner?.balance) + pf(userHaveToInvest) })
+
         }
         else alert("Something wrong.Please input correct value")
 
 
     }
-    
+
     return (
         <div>
-            
+
             <EachPageBanner content='Project' />
             <div className="container mt-5">
                 <div>
@@ -137,54 +179,62 @@ const ProjectDetail = () => {
                         <div className='project-detail-all-informations w-25 d-flex flex-column align-items-start'>
                             {/* <div className='project-detail-all-informations-child text-end'> */}
                             <div className=''>
-                                <h5>Project Description</h5>
+                                <h5>Project Detail</h5>
                                 <hr style={{ width: "80px", borderWidth: "2px", borderColor: 'black' }} />
                             </div>
                             <div>
-                                <p style={{ color: '#001140' }}>
-                                    Valuation: <strong className='fw-bold'> {currencyFormatter.format(valuation)}</strong> <br />
-                                    Amount: <strong className='fw-bold'>{currencyFormatter.format(amount)}</strong> <br />
-                                    Equity: <strong className='fw-bold'>{equity} %</strong> <br />
-                                    Minimum Equity to Buy: <strong className='fw-bold'>{minimumEquityBuy} %</strong> <br />
-                                    Added Date:<strong className='fw-bold'> {`${date.getFullYear()}-${String(date?.getMonth() + 1)?.padStart(2, '0')}-${String(date?.getDate())?.padStart(2, '0')}`} </strong><br />
-                                    Minimum Return Date: <strong className='fw-bold'>{minimumReturnDate}</strong> <br />
-                                    Owners Email: <strong className='fw-bold'>{ownersInfo?.email}</strong><br />
-                                    Category: <strong className='fw-bold'>
-                                        <i className={iconClassName} style={{ marginRight: "8px" }}></i>
+                                {
+                                    updateLoading ? <div className="spinner-border" role="status">
+                                        <span className="visually-hidden"></span>
+                                    </div> :
+                                        <>
+                                            <p style={{ color: '#001140' }}>
+                                                Valuation: <strong className='fw-bold'> {currencyFormatter.format(valuation)}</strong> <br />
+                                                Amount: <strong className='fw-bold'>{currencyFormatter.format(amount)}</strong> <br />
+                                                Equity: <strong className='fw-bold'>{equity} %</strong> <br />
+                                                Minimum Equity to Buy: <strong className='fw-bold'>{minimumEquityBuy} %</strong> <br />
+                                                Added Date:<strong className='fw-bold'> {`${date.getFullYear()}-${String(date?.getMonth() + 1)?.padStart(2, '0')}-${String(date?.getDate())?.padStart(2, '0')}`} </strong><br />
+                                                Minimum Return Date: <strong className='fw-bold'>{minimumReturnDate}</strong> <br />
+                                                Owners Email: <strong className='fw-bold'>{ownersInfo?.email}</strong><br />
+                                                Category: <strong className='fw-bold'>
+                                                    <i className={iconClassName} style={{ marginRight: "8px" }}></i>
 
-                                        {category}
+                                                    {category}
 
-                                    </strong>
+                                                </strong>
 
-                                </p>
-                                <div className='mb-3 d-flex flex-column'>
-                                    <input 
-                                    type='number' 
-                                    value={equityValue} 
-                                    onChange={(e) => setEquityValue(e.target.value)} 
-                                    style={{ color: '#001140' }} 
-                                    className='mb-3'
-                                    />
-                                    <div  onClick={handleGetEquityFunctionalities} >
-                                    
-                                    <SwipeRightButton content='Get Equity'/>
-                                    </div>
-                                </div>
+                                            </p>
+                                            <div className='mb-3 d-flex flex-column'>
+                                                <input
+                                                    type='number'
+                                                    value={equityValue}
+                                                    onChange={(e) => setEquityValue(e.target.value)}
+                                                    style={{ color: '#001140' }}
+                                                    className='mb-3'
+                                                />
+                                                <div onClick={handleGetEquityFunctionalities} >
 
-                                <div>
-                                    <p style={{ color: '#001140' }}>Investors: </p>
-                                    {
-                                        investorsInfo?.map((investor, index) => investor?.email === user?.email && <p key={index} style={{ color: '#001140' }} className='fw-bold'>{investor?.email}</p>)
-                                    }
-                                </div>
+                                                    <SwipeRightButton content='Get Equity' />
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <p style={{ color: '#001140' }}>Investors: </p>
+                                                {
+                                                    investorsInfo?.map((investor, index) => investor?.email === user?.email && <p key={index} style={{ color: '#001140' }} className='fw-bold'>{investor?.email}</p>)
+                                                }
+                                            </div></>
+
+                                }
+
                             </div>
                         </div>
                         {/* </div> */}
                     </div>
-                    
+
                 </div>
             </div>
-            
+
         </div>
 
     );
