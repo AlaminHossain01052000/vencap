@@ -43,17 +43,18 @@ const MyInvestments = () => {
         <div className="container pt-5 mt-5" >
            
             <Table striped bordered hover responsive>
-                <thead>
+                <thead  className='text-center'>
                     <tr>
                         <th>No.</th>
                         <th>Project Title</th>
                         <th>Amount</th>
                         <th>Equity</th>
-                        <th>Valuation</th>
-                        <th>Return Date</th>
+                        <th>Previous Valuation</th>
+                        <th>Current Valuation</th>
+                        <th>Return Request</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody className='text-center'>
                     {myinvests?.map((project, index) => (
                         <tr key={project?._id}>
                             <td>{index + 1}</td>
@@ -61,7 +62,8 @@ const MyInvestments = () => {
                             <td>{project?.amount}</td>
                             <td>{project?.equity}%</td>
                             <td>{valuationCal(project?.equity,project?.amount)}</td>
-                            <td>{project?.returnDate}</td>
+                            <td>{valuationCal(project?.equity,project?.amount)}</td>
+                            <td><button className='btn btn-primary mx-auto'>Return</button></td>
                         </tr>
                     ))}
                 </tbody>

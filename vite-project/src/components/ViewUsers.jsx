@@ -60,16 +60,16 @@ const ViewUsers = () => {
                 <tbody>
                     {users.map(user => (
                         <tr key={user._id}>
-                            <td>{user.name}</td>
-                            <td>{user.email}</td>
-                            <td>{user.contact}</td>
-                            <td>{user.balance}</td>
+                            <td>{user?.name}</td>
+                            <td>{user?.email}</td>
+                            <td>{user?.contact}</td>
+                            <td>{user?.balance}</td>
                             <td>{formatDate(user.date)}</td>
                             <td>
                                 {admin && (
                                     <button
                                         className="btn btn-danger"
-                                        onClick={() => handleDeleteUser(user.email)}
+                                        onClick={() => handleDeleteUser(user?.email)}
                                     >
                                         Delete
                                     </button>
