@@ -2,6 +2,7 @@ import { useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import axios from 'axios';
 import EachPageBanner from '../utilities/EachPageBanner';
+import pf from '../utilities/pf';
 
 const AddNewProject = () => {
   const { user } = useAuth();
@@ -82,6 +83,11 @@ const AddNewProject = () => {
    };
 
    try {
+    projectData.equity=pf(projectData.equity);
+    projectData.amount=pf(projectData.amount);
+    projectData.minimumEquityBuy=pf(projectData.minimumEquityBuy);
+    projectData.valuation=pf(projectData.valuation);
+
      await axios.post('http://localhost:5000/projects', projectData);
      setSuccess('Project added successfully!');
      setError('');

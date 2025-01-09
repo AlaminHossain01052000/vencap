@@ -8,6 +8,7 @@ const Login = () => {
     email: '',
     password: '',
   });
+  const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
   const [currentError, setCurrentError] = useState('');
   const { loginUser, loading, error } = useAuth();
   const navigate = useNavigate();
@@ -30,50 +31,69 @@ const Login = () => {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <div>
-      <EachPageBanner content="Login"/>
+      <EachPageBanner content="Login" />
       <div className="container mt-5 d-flex align-items-center">
-        <div className='w-50'>
-        {currentError && <p className="text-danger">{currentError}</p>}
-        {error && <p className="text-danger">{error}</p>}
-        <form onSubmit={handleSubmit}>
-          <div className="form-group mb-3">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              className="form-control"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group mb-3">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              className="form-control"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <button type="submit" className="btn btn-dark">
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-        <p className="mt-3">
-          Don{"'"}t have an account? <Link to="/signup" style={{textDecoration:'none'}}>Sign Up</Link>
-        </p>
+        <div className="w-50">
+          {currentError && <p className="text-danger">{currentError}</p>}
+          {error && <p className="text-danger">{error}</p>}
+          <form onSubmit={handleSubmit}>
+            <div className="form-group mb-3">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                className="form-control"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group mb-3">
+              <label htmlFor="password">Password</label>
+              <div className="input-group">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  className="form-control"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  onClick={togglePasswordVisibility}
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
+            </div>
+            <button type="submit" className="btn btn-dark">
+              {loading ? 'Logging in...' : 'Login'}
+            </button>
+          </form>
+          <p className="mt-3">
+            Don{"'"}t have an account?{' '}
+            <Link to="/signup" style={{ textDecoration: 'none' }}>
+              Sign Up
+            </Link>
+          </p>
         </div>
-        <div className='w-50'>
-          <img src="../../assets/images/login.jpg" alt="login" className='w-100'/>
+        <div className="w-50">
+          <img
+            src="../../assets/images/login.jpg"
+            alt="login"
+            className="w-100"
+          />
         </div>
-        
       </div>
     </div>
   );

@@ -1,2 +1,5 @@
-function pf(x){return parseFloat(x);}
-export default pf;
+function pf(x) {
+    return parseFloat(parseFloat(x).toFixed(2));
+  }
+  export default pf;
+  
