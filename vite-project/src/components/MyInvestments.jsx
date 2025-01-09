@@ -43,7 +43,7 @@ const MyInvestments = () => {
         <div className="container pt-5 mt-5" >
            
             <Table striped bordered hover responsive>
-                <thead>
+                <thead  className='text-center'>
                     <tr>
                         <th>No.</th>
                         <th>Project Title</th>
@@ -60,17 +60,7 @@ const MyInvestments = () => {
                     {myinvests?.map((project,index) => (
                         
                         <MyInvestment key={index} project={project} index={index}/>
-                        // <tr key={project?._id}>
-                        //     <td>{index + 1}</td>
-                        //     <td>{project?.title}</td>
-                        //     <td>{project?.amount}</td>
-                        //     <td>{project?.equity}%</td>
-                        //     <td>{valuationCal(project?.equity,project?.amount)}</td>
-                        //     <td>{project?.returnDate}</td>
-                        //     <td>{project?.returnDate}</td>
-                        //     <td>{project?.returnDate}</td>
-                        //     <td>{project?.returnDate}</td>
-                        // </tr>
+                        
                     ))}
                 </tbody>
             </Table>

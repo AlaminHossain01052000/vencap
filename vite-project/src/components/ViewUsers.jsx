@@ -1,6 +1,5 @@
 import  { useState, useEffect } from 'react';
 import axios from 'axios';
-import useFirebase from '../hooks/useFirebase';
 import EachPageBanner from '../utilities/EachPageBanner';
 import useAuth from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -60,16 +59,16 @@ const ViewUsers = () => {
                 <tbody>
                     {users.map(user => (
                         <tr key={user._id}>
-                            <td>{user.name}</td>
-                            <td>{user.email}</td>
-                            <td>{user.contact}</td>
-                            <td>{user.balance}</td>
+                            <td>{user?.name}</td>
+                            <td>{user?.email}</td>
+                            <td>{user?.contact}</td>
+                            <td>{user?.balance}</td>
                             <td>{formatDate(user.date)}</td>
                             <td>
                                 {admin && (
                                     <button
                                         className="btn btn-danger"
-                                        onClick={() => handleDeleteUser(user.email)}
+                                        onClick={() => handleDeleteUser(user?.email)}
                                     >
                                         Delete
                                     </button>
