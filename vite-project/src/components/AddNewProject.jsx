@@ -6,6 +6,7 @@ import pf from '../utilities/pf';
 
 const AddNewProject = () => {
   const { user } = useAuth();
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -32,7 +33,7 @@ const AddNewProject = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData({ ...formData, image: file });
+      setSelectedFile(file);
     }
   };
 
@@ -43,8 +44,8 @@ const AddNewProject = () => {
     formData.valuation = (parseFloat(formData.amount) * 100.00) / parseFloat(formData.equity);
 
     // Date adding
-    formData.additionTime = new Date();
-
+    formData.additionTime = new Date().toISOString();
+    formData.image=selectedFile;
     // Check if minimumReturnDate is not a past or current date
     const returnDate = new Date(formData.minimumReturnDate);
     const currentDate = new Date();
@@ -62,25 +63,22 @@ const AddNewProject = () => {
         setError("Please Enter a valid Number")
         return;
     }
-    else if (!formData.image) {
-        setError('Please select an image.');
-        return;
-      }
+    if (!selectedFile) {
+      setError('Please select an image.');
+      return;
+    }
     // Handle adding images in the MongoDB database
  formData.ownersInfo={ email: user.email, name: user?.displayName?user.displayName:user?.name };
 
+
     
- const reader = new FileReader();
- reader.readAsDataURL(formData?.image);
- reader.onloadend = async () => {
-   const base64Image = reader.result.split(',')[1];
+ 
+
+  //  const base64Image = reader.result.split(',')[1];
 
    // Prepare data to send to server
-   const projectData = {
-     ...formData,
-     image: base64Image, // Send base64 image data to server
-     additionTime: new Date().toISOString()
-   };
+   const projectData =formData;
+  //  console.log(projectData)
 
    try {
     projectData.equity=pf(projectData.equity);
@@ -88,7 +86,10 @@ const AddNewProject = () => {
     projectData.minimumEquityBuy=pf(projectData.minimumEquityBuy);
     projectData.valuation=pf(projectData.valuation);
 
-     await axios.post('http://localhost:5000/projects', projectData);
+    //  await axios.post('http://localhost:5000/projects', projectData);
+    await axios.post('http://localhost:5000/projects', projectData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
      setSuccess('Project added successfully!');
      setError('');
     //  console.log(response.data);
@@ -111,7 +112,7 @@ const AddNewProject = () => {
      setError('Error adding project. Please try again.');
      setSuccess('');
    }
- };
+ 
   };
 
   const categories = ["", "Agriculture", "Technology", "Healthcare", "Finance", "Real State", "Others"];

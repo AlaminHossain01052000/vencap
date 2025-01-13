@@ -5,6 +5,7 @@ import EachPageBanner from '../utilities/EachPageBanner';
 
 const Signup = () => {
   const [currentError, setCurrentError] = useState('');
+  const [file,setSelectedFile]=useState(null)
   const { registerNewUser, loading, error } = useAuth();
 const navigate=useNavigate();
   const [formData, setFormData] = useState({
@@ -26,9 +27,9 @@ const navigate=useNavigate();
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData({ ...formData, photo: file });
+    const file1 = e.target.files[0];
+    if (file1) {
+      setSelectedFile(file1);
     }
   };
 
@@ -48,6 +49,7 @@ const navigate=useNavigate();
     } else {
       setCurrentError('');
       // Add photo generation logic using name if photo is empty
+      formData.photo=file;
       if (!formData.photo) {
         formData.photo = `https://ui-avatars.com/api/?name=${formData.name}`;
         formData.date=new Date()
@@ -57,14 +59,12 @@ const navigate=useNavigate();
 
       }
       else{
-        const reader = new FileReader();
-        reader.readAsDataURL(formData?.photo);
-        reader.onloadend = async () => {
-          const base64Image = reader.result.split(',')[1];
-          formData.photo=base64Image;
+        
+      console.log("first")
+         
           formData.date=new Date()
           registerNewUser(formData,navigate);
-        }
+        
 
       }
       

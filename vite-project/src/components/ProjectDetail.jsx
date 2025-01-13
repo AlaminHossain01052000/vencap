@@ -86,7 +86,7 @@ const ProjectDetail = () => {
                 const reponse = await axios.put("http://localhost:5000/projects", {
                     projectId: id,
                     newEquity,
-                    newInvestorsInfo: investorsInfo.map(investor => {
+                    newInvestorsInfo: investorsInfo?.map(investor => {
                         if (investor.email === user.email) {
                             return {
                                 ...investor,
@@ -95,7 +95,7 @@ const ProjectDetail = () => {
                         }
                         return investor;
                     }).concat(
-                        investorsInfo.some(investor => investor.email === user.email)
+                        investorsInfo?.some(investor => investor.email === user.email)
                             ? []
                             : [{ email: user.email, equity: parseFloat(equityValue) }]
                     ),
@@ -160,7 +160,7 @@ const ProjectDetail = () => {
             <div className="container mt-5">
                 <div>
                     {/* Project image */}
-                    <img src={image === undefined ? `https://ui-avatars.com/api/?name=${title}` : `data:image/png;base64,${image}`} alt={title} className='w-100' style={{ height: "600px" }} />
+                    <img src={image === undefined||image===null ? `https://ui-avatars.com/api/?name=${title}` : `http://localhost:5000${image}`} alt={title} className='w-100' style={{ height: "600px" }} />
                     <div className='d-flex justify-content-center mt-5'>
                         <div className='project-detail-description w-75'>
                             <div className='d-flex flex-column'>
@@ -221,7 +221,7 @@ const ProjectDetail = () => {
                                             <div>
                                                 <p style={{ color: '#001140' }}>Investors: </p>
                                                 {
-                                                    investorsInfo?.map((investor, index) => investor?.email === user?.email && <p key={index} style={{ color: '#001140' }} className='fw-bold'>{investor?.email}</p>)
+                                                   investorsInfo?.size()>0&& investorsInfo?.map((investor, index) => investor?.email === user?.email && <p key={index} style={{ color: '#001140' }} className='fw-bold'>{investor?.email}</p>)
                                                 }
                                             </div></>
 

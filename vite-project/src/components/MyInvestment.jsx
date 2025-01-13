@@ -15,7 +15,7 @@ const MyInvestment = (props) => {
         
         
     }, [project,setProjectDetails]);
-    
+    console.log(projectDetails)
     const profitCal=()=>{
         return ((projectDetails?.valuation-valuationCal(project?.equity, project?.amount))*(project?.equity/100));
     }

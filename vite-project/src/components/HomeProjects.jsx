@@ -44,7 +44,7 @@ const HomeProjects = () => {
                         <Card onClick={() => handleCardClick(project?._id)} className='h-100'>
                             <div className='home-projects-card-image-container'>
                                 <Card.Img variant="top" 
-                                src={project?.image===undefined?`https://ui-avatars.com/api/?name=${project?.title}`:`data:image/png;base64,${project?.image}`} 
+                                src={project?.image===undefined||project?.image===null?`https://ui-avatars.com/api/?name=${project?.title}`:`http://localhost:5000${project?.image}`} 
                                 alt={project?.title} 
                                 className="home-projects-card-image w-100 h-100" 
                                

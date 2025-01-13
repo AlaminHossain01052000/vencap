@@ -1,5 +1,8 @@
 const express = require('express');
-const SSLCommerzPayment = require('sslcommerz-lts')
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+const SSLCommerzPayment = require('sslcommerz-lts');
 const app = express();
 const { MongoClient } = require('mongodb');
 const port = process.env.PORT || 5000;
@@ -25,6 +28,27 @@ const client = new MongoClient(uri, {
     socketTimeoutMS: 60000,
 });
 const hex = /[0-9A-Fa-f]{6}/g;
+
+//==========multer start here=====
+// Ensure the uploads directory exists
+const uploadDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+
+// Configure storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir); // Save files in the 'uploads' directory
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + file.originalname;
+    cb(null, uniqueSuffix); // Create a unique file name
+  },
+});
+
+const upload = multer({ storage });
+//==========multer ends here=====
 async function run() {
     try {
         await client.connect();
@@ -54,11 +78,25 @@ async function run() {
 
 
         // post a new product
-        app.post("/projects", async (req, res) => {
-            const newProject = await projectCollection.insertOne(req.body);
-            res.json(newProject);
-        })
-
+        // app.post("/projects", async (req, res) => {
+        //     const newProject = await projectCollection.insertOne(req.body);
+        //     res.json(newProject);
+        // })
+        app.post("/projects", upload.single("image"), async (req, res) => {
+            try {
+              const projectData = {
+                ...req.body,
+                // Parse JSON string
+                image: req.file ? `/uploads/${req.file.filename}` : null, // Save the relative path to the image
+              };
+          
+              const newProject = await projectCollection.insertOne(projectData);
+              res.json(newProject);
+            } catch (error) {
+              console.error("Error adding project:", error);
+              res.status(500).json({ message: "Error adding project" });
+            }
+          });
         app.put("/projects", async (req, res) => {
             try {
                 // console.log(req.body);
@@ -125,11 +163,26 @@ async function run() {
         })
 
         // post a new user in database
-        app.post("/users", async (req, res) => {
+        app.post("/users", upload.single("photo"), async (req, res) => {
+            try {
+                console.log(req.file.filename)
+              const userInfo = {
+                ...req.body,
+                photo: req.file ? `/uploads/${req.file.filename}` : null, // Save the relative path to the image
+              };
+          
+              const newUser = await userCollection.insertOne(userInfo);
+              res.json(newUser);
+            } catch (error) {
+              console.error("Error adding user:", error);
+              res.status(500).json({ message: "Error adding user" });
+            }
+          });
+        // app.post("/users", async (req, res) => {
 
-            const newUser = await userCollection.insertOne(req.body);
-            res.json(newUser);
-        })
+        //     const newUser = await userCollection.insertOne(req.body);
+        //     res.json(newUser);
+        // })
 
 
 
@@ -226,11 +279,11 @@ async function run() {
                 console.log('Redirecting to: ', GatewayPageURL)
             });
             await withdrawCollection.insertOne({
-                tranId:newTransactionId,
+                tranId: newTransactionId,
                 withdrawInfo,
             })
             // console.log((parseFloat(rechargeInfo.balance) ,parseFloat(rechargeInfo.amount)))
-            
+
 
 
 
@@ -239,14 +292,14 @@ async function run() {
         app.post('/withdraw/success/:tranId', async (req, res) => {
             const { tranId } = req.params;
             // console.log(tranId)
-              const allWithdrawInfo=await withdrawCollection.findOne({tranId:tranId})
+            const allWithdrawInfo = await withdrawCollection.findOne({ tranId: tranId })
             //   console.log(allRechargeInfo)
-            const withdrawInfo=allWithdrawInfo.withdrawInfo
-            withdrawInfo.newBalance=parseFloat(withdrawInfo.balance)-parseFloat(withdrawInfo.amount)
+            const withdrawInfo = allWithdrawInfo.withdrawInfo
+            withdrawInfo.newBalance = parseFloat(withdrawInfo.balance) - parseFloat(withdrawInfo.amount)
             try {
-                
 
-               
+
+
 
                 const updateUserBalance = await userCollection.updateOne(
                     { email: withdrawInfo.email },
@@ -283,9 +336,9 @@ async function run() {
         app.post('/recharge', async (req, res) => {
             const rechargeInfo = req.body;
             const newTransactionId = new ObjectId().toString();
-        
+
             rechargeInfo.balance = (rechargeInfo?.balance === null || rechargeInfo?.balance === undefined) ? 0 : rechargeInfo.balance;
-        
+
             const data = {
                 total_amount: parseFloat(rechargeInfo.amount),
                 currency: 'BDT',
@@ -316,7 +369,7 @@ async function run() {
                 ship_postcode: 1000,
                 ship_country: 'Bangladesh',
             };
-        
+
             const sslcz = new SSLCommerzPayment(store_id, store_passwd, is_live);
             sslcz.init(data).then(apiResponse => {
                 let GatewayPageURL = apiResponse.GatewayPageURL;
@@ -324,17 +377,17 @@ async function run() {
                 console.log('Redirecting to: ', GatewayPageURL);
             });
             await rechargeCollection.insertOne({
-                tranId:newTransactionId,
+                tranId: newTransactionId,
                 rechargeInfo
             })
         });
-        
+
         app.post('/recharge/success/:tranId', async (req, res) => {
             const { tranId } = req.params;
             // console.log(tranId)
-              const allRechargeInfo=await rechargeCollection.findOne({tranId:tranId})
+            const allRechargeInfo = await rechargeCollection.findOne({ tranId: tranId })
             //   console.log(allRechargeInfo)
-            const rechargeInfo=allRechargeInfo.rechargeInfo
+            const rechargeInfo = allRechargeInfo.rechargeInfo
             try {
                 const userInfo = {
                     name: rechargeInfo?.name,
@@ -342,7 +395,7 @@ async function run() {
                     contact: rechargeInfo?.contact,
                     balance: (parseFloat(rechargeInfo.balance === null ? 0 : rechargeInfo.balance) + parseFloat(rechargeInfo.amount)),
                 };
-        
+
                 const newRecharge = await rechargeCollection.insertOne({
                     ...userInfo,
                     amount: rechargeInfo?.amount,
@@ -350,13 +403,13 @@ async function run() {
                     transactionId: tranId,
                     paymentStatus: 'paid'
                 });
-        
+
                 if (!isNaN(parseFloat(rechargeInfo.balance) + parseFloat(rechargeInfo.amount))) {
                     const updateUserBalance = await userCollection.updateOne(
                         { email: rechargeInfo.email },
                         { $set: { balance: parseFloat(parseFloat(rechargeInfo.balance) + parseFloat(rechargeInfo.amount)) } }
                     );
-        
+
                     if (updateUserBalance.modifiedCount > 0) {
                         console.log("User updates successfully");
                     } else {
@@ -371,11 +424,24 @@ async function run() {
                 res.redirect("http://localhost:5173/my-profile");
             }
         });
-        
+
         app.post('/recharge/fail/:tranId', async (req, res) => {
             console.log("recharge is failed");
             res.redirect("http://localhost:5173/my-profile");
         });
+        //================multer start here=====
+        // Endpoint for file upload
+        app.post("/upload", upload.single("image"), (req, res) => {
+            if (!req.file) {
+                return res.status(400).send("No file uploaded.");
+            }
+            res.send({ filePath: `http://localhost:5000/uploads/${req.file.filename}` });
+        });
+
+        // Static folder to serve uploaded files
+        app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+        //==============multer ends here========
 
     }
     finally {

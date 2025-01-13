@@ -119,7 +119,9 @@ const Projects = () => {
                         </div>
                     </div>
                 </div>
+                
                 <div className="row row-cols-1 row-cols-md-3 g-4">
+                
                     {filteredProjects.map(project => (
                         <div key={project._id} className="col">
                             <Project project={project} />

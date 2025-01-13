@@ -65,7 +65,10 @@ const HomeNavbar1 = () => {
         user?.uid?
         <li className="nav-item dropdown">
           <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src={`data:image/png;base64,${userPhoto}`}alt="user-photo" width={15} />
+            <img 
+            src={userPhoto===undefined||userPhoto===null?`https://ui-avatars.com/api/?name=${user?.name}`:`http://localhost:5000${userPhoto}`} 
+            alt="user-photo" width={15} />
+            
           </a>
           
             <ul className="dropdown-menu">

@@ -171,7 +171,7 @@ const MyProfile = () => {
                 <div className="card-body">
                     <div className="row  d-flex align-items-center flex-row">
                         <div className="col-md-3">
-                            <img src={profile?.photo === undefined ? `https://ui-avatars.com/api/?name=${profile?.name}` : `data:image/png;base64,${profile.photo}`}  alt="User Photo" className="img-fluid rounded-circle" />
+                            <img src={profile?.photo === undefined||profile.photo===null ? `https://ui-avatars.com/api/?name=${profile?.name}` : `http://localhost:5000${profile.photo}`}  alt="User Photo" className="img-fluid rounded-circle" />
                         </div>
                         <div className="col-md-9">
                             <h3 className="card-title">{profile?.name}</h3>

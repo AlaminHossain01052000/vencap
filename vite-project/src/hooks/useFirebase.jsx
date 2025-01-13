@@ -28,8 +28,10 @@ const useFirebase = () => {
                     setError(error);
 
                 });
-
-                axios.post('http://localhost:5000/users', {...userInfo,balance:0})
+                 axios.post('http://localhost:5000/users', {...userInfo,balance:0}, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                  });
+                // axios.post('http://localhost:5000/users', {...userInfo,balance:0})
                 setLoading(false)
                 navigate("/");
             })

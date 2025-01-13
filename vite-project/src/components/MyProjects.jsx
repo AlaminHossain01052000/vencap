@@ -12,11 +12,11 @@ const MyProjects = () => {
     const navigate = useNavigate();
 const {user}=useAuth();
 
-
+// console.log(projects)
     useEffect(() => {
         axios.get('http://localhost:5000/projects')
             .then(response => {
-                setProjects(response?.data?.filter(project=>project?.ownersInfo?.email!==user?.email));
+                setProjects(response?.data?.filter(project=>project?.ownersInfo?.email===user?.email));
             //    (projects.map(project=>project?.investorsInfo?.map(investor=>console.log(investor))))
             })
             .catch(error => {
@@ -25,6 +25,9 @@ const {user}=useAuth();
     }, [projects,user]);
 
     const handleDetailsClick = (projectId) => {
+        console.log(projectId)
+        if(!projectId)alert("Something went wrong. Please try again letter")
+        else
         navigate(`/projectdetail/${projectId}`);
     };
 
@@ -75,7 +78,7 @@ const {user}=useAuth();
                                             <td>
                                                 <button 
                                                     className="btn btn-primary" 
-                                                    onClick={() => handleDetailsClick(project?.id)}
+                                                    onClick={() => handleDetailsClick(project?._id)}
                                                 >
                                                     Details
                                                 </button>

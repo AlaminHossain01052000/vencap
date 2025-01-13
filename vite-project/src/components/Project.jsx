@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import './Project.css'
 import { useNavigate } from 'react-router-dom';
 import { currencyFormatter } from '../utilities/others';
-import useAuth from '../hooks/useAuth';
+
 const Project = ({ project }) => {
     const { _id,title, amount, equity, image, valuation } = project;
-// console.log(image)
-const {user}=useAuth()
+
+
 const navigate=useNavigate()
     const handleNavigateToProjectDetailPage=()=>{
        
@@ -23,7 +23,9 @@ const navigate=useNavigate()
             {/* Project image */}
             <div className='single-project-card-image-container' onClick={handleNavigateToProjectDetailPage}>
                 <img 
-                src={image===undefined?`https://ui-avatars.com/api/?name=${title}`:`data:image/png;base64,${image}`} 
+                
+                // src={image===undefined?`https://ui-avatars.com/api/?name=${title}`:`http://localhost:5000${image}`} 
+                src={image === undefined||image===null ? `https://ui-avatars.com/api/?name=${title}` : `http://localhost:5000${image}`}
                 className="card-img-top single-project-image" 
                 height={400} 
                 alt={title} />
