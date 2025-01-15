@@ -51,9 +51,9 @@ const MyInvestments = () => {
                         <th>Equity</th>
                         <th>Valuation</th>
                         <th>Expected Return Date</th>
-                        <th>Current Valuation</th>
+                        
                         <th>Profit</th>
-                        <th>Withdraw</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
