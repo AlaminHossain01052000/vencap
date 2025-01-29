@@ -16,6 +16,9 @@ import HomeNavbar1 from './components/HomeNavbar1'
 import ViewProject from './components/ViewProject'
 import ViewUsers from './components/ViewUsers'
 import Chat from './components/Chat'
+import UserVerification from './components/UserVerification'
+import Complain from './components/Complain'
+import MyComplains from './components/MyComplains'
 
 
 function App() {
@@ -39,6 +42,9 @@ function App() {
           <Route path='/view-project' Component={ViewProject} />
           <Route path='/view-users' Component={ViewUsers} />
           <Route path='/login' Component={Login} />
+          <Route path='/user-verification' Component={UserVerification} />
+          <Route path='/complain-form' Component={Complain} />
+          <Route path='/my-complains' Component={MyComplains} />
           <Route path='/signup' Component={Signup} />
         </Routes>
       <Chat/>

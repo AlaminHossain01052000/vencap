@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import useAuth from '../hooks/useAuth';
@@ -16,9 +17,10 @@ const MyProfile = () => {
     
     // const [prevBalance,setPrevBalance]=useState(0);
     const {user}=useAuth();
+    
     useEffect(() => {
         // console.log(user)
-         axios.get(`http://localhost:5000/users/single?email=${user?.email}`)
+         axios.get(`http://localhost:5001/users/single?email=${user?.email}`)
             .then(response => {
                 // console.log(response)
                 setProfile(response.data);
@@ -88,7 +90,7 @@ const MyProfile = () => {
         if(!confirm)return
         try {
             var withdrawUrl=""
-            await axios.post("http://localhost:5000/withdraw",
+            await axios.post("http://localhost:5001/withdraw",
                 {
                     name:profile.name,
                     email:profile.email,
@@ -130,7 +132,7 @@ const MyProfile = () => {
         if(res){
             try{
                 var rechargeUrl="";
-                await axios.post("http://localhost:5000/recharge",{...profile,amount:amount,rechargeTime:new Date().toISOString()}).then(responseUrl=>{
+                await axios.post("http://localhost:5001/recharge",{...profile,amount:amount,rechargeTime:new Date().toISOString()}).then(responseUrl=>{
                 
                     rechargeUrl=responseUrl.data.url
                     
@@ -171,10 +173,21 @@ const MyProfile = () => {
                 <div className="card-body">
                     <div className="row  d-flex align-items-center flex-row">
                         <div className="col-md-3">
-                            <img src={profile?.photo === undefined||profile.photo===null ? `https://ui-avatars.com/api/?name=${profile?.name}` : `http://localhost:5000${profile.photo}`}  alt="User Photo" className="img-fluid rounded-circle" />
+                            <img src={profile?.photo === undefined||profile.photo===null ? `https://ui-avatars.com/api/?name=${profile?.name}` : `http://localhost:5001${profile.photo}`}  alt="User Photo" className="img-fluid rounded-circle" />
                         </div>
                         <div className="col-md-9">
-                            <h3 className="card-title">{profile?.name}</h3>
+                            <h3 className="card-title">
+                                {profile?.name}
+                                {(profile?.isVerified===undefined||profile?.isVerified===false) &&
+                                    <sup 
+                                    className="text-warning"
+                                    data-bs-toggle="tooltip" 
+                                    title="Not Verified">
+                                        <i className="fas fa-exclamation"></i>
+                                    </sup>
+                                }
+                                
+                                </h3>
                             <p className="card-text"><strong>Email:</strong> {profile?.email}</p>
                             <p className="card-text"><strong>Contact No:</strong> {profile?.contact}</p>
                             <p className="card-text"><strong>Balance:</strong> {profile?.balance===null||profile?.balance===undefined?0:profile.balance}</p>
@@ -190,8 +203,10 @@ const MyProfile = () => {
 
                                 
                                 <div className='w-25 d-flex  flex-column justify-content-between mt-4'>   
-                                <button className="btn btn-primary mb-3" onClick={handleWithdraw}>Withdraw</button>
-                                <button className="btn btn-success" onClick={handleRecharge}>Recharge</button>
+                                <button className="btn btn-primary mb-3" onClick={handleWithdraw} disabled={profile?.isVerified===false||profile?.isVerified===undefined}>Withdraw</button>
+                                <button className="btn btn-success" onClick={handleRecharge} 
+                                 disabled={profile?.isVerified===false||profile?.isVerified===undefined}
+                                >Recharge</button>
                                 </div>
                             </div>
                             

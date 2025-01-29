@@ -18,7 +18,8 @@ const navigate=useNavigate();
     myprojects: [],
     myinvests: [],
     isOwner: false,
-    date:''
+    date:'',
+    isVerified:false
   });
 
   const handleChange = (e) => {
@@ -54,7 +55,7 @@ const navigate=useNavigate();
         formData.photo = `https://ui-avatars.com/api/?name=${formData.name}`;
         formData.date=new Date()
       // console.log(formData)
-
+        
       registerNewUser(formData,navigate);
 
       }

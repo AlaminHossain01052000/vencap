@@ -18,7 +18,7 @@ const ViewUsers = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/users');
+            const response = await axios.get('http://localhost:5001/users');
             setUsers(response.data);
         } catch (error) {
             console.error("There was an error fetching the users!", error);

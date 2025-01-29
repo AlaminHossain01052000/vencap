@@ -11,7 +11,7 @@ const HomeProject = () => {
         // Fetching project data by ID
         const fetchProject = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/project/${id}`);
+                const response = await axios.get(`http://localhost:5001/project/${id}`);
                 setProject(response.data);
                 // console.log(response.data)
             } catch (error) {

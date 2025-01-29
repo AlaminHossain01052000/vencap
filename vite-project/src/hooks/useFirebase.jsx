@@ -28,10 +28,10 @@ const useFirebase = () => {
                     setError(error);
 
                 });
-                 axios.post('http://localhost:5000/users', {...userInfo,balance:0}, {
+                 axios.post('http://localhost:5001/users', {...userInfo,balance:0}, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                   });
-                // axios.post('http://localhost:5000/users', {...userInfo,balance:0})
+                // axios.post('http://localhost:5001/users', {...userInfo,balance:0})
                 setLoading(false)
                 navigate("/");
             })
@@ -77,7 +77,7 @@ const useFirebase = () => {
         }
         try {
             // Fetch user data to get user ID
-            const response = await axios.get(`http://localhost:5000/users/single?email=${email}`);
+            const response = await axios.get(`http://localhost:5001/users/single?email=${email}`);
             const userToDelete = response.data;
 
             if (!userToDelete) {
@@ -86,7 +86,7 @@ const useFirebase = () => {
             console.log(userToDelete)
 
             // Delete user from local database
-            await axios.delete(`http://localhost:5000/users/${userToDelete._id}`);
+            await axios.delete(`http://localhost:5001/users/${userToDelete._id}`);
 
             // Delete user from Firebase
             const userRecord = await auth.getUserByEmail(email);

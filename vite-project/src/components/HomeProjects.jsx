@@ -12,7 +12,7 @@ const HomeProjects = () => {
         // Fetching projects data
         const fetchProjects = async () => {
             try {
-                 const response=await axios.get('http://localhost:5000/projects')
+                 const response=await axios.get('http://localhost:5001/projects')
                     // console.log(response?.data)
              
                 // Sorting projects by additionTime in descending order
@@ -44,7 +44,7 @@ const HomeProjects = () => {
                         <Card onClick={() => handleCardClick(project?._id)} className='h-100'>
                             <div className='home-projects-card-image-container'>
                                 <Card.Img variant="top" 
-                                src={project?.image===undefined||project?.image===null?`https://ui-avatars.com/api/?name=${project?.title}`:`http://localhost:5000${project?.image}`} 
+                                src={project?.image===undefined||project?.image===null?`https://ui-avatars.com/api/?name=${project?.title}`:`http://localhost:5001${project?.image}`} 
                                 alt={project?.title} 
                                 className="home-projects-card-image w-100 h-100" 
                                
@@ -54,6 +54,7 @@ const HomeProjects = () => {
                                     <Card.Text className="fw-bold" style={{color:'#FFFFFF'}}>
                                         Amount: ৳{project?.amount} <br />
                                         Equity: {project?.equity}% <br />
+                                        Interest: {project?.interest?project?.interest:"20"}% <br />
                                         Valuation: ৳{project?.valuation}
                                     </Card.Text>
                                 </Card.Body>

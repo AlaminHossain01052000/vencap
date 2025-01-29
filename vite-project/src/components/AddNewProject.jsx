@@ -20,7 +20,8 @@ const AddNewProject = () => {
     investorsInfo: [],
     category: '',
     image:null,
-    additionTime: ''
+    additionTime: '',
+    interest:0
   });
 
   const [error, setError] = useState('');
@@ -86,8 +87,8 @@ const AddNewProject = () => {
     projectData.minimumEquityBuy=pf(projectData.minimumEquityBuy);
     projectData.valuation=pf(projectData.valuation);
 
-    //  await axios.post('http://localhost:5000/projects', projectData);
-    await axios.post('http://localhost:5000/projects', projectData, {
+    //  await axios.post('http://localhost:5001/projects', projectData);
+    await axios.post('http://localhost:5001/projects', projectData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
      setSuccess('Project added successfully!');
@@ -195,6 +196,18 @@ const AddNewProject = () => {
               id="minimumEquityBuy"
               name="minimumEquityBuy"
               value={formData.minimumEquityBuy}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group mb-3">
+            <label style={{color:'#001140'}} htmlFor="interset">Interest (%)</label>
+            <input
+              type="number"
+              className="form-control"
+              id="interest"
+              name="interest"
+              value={formData.interest}
               onChange={handleChange}
               required
             />

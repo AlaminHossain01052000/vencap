@@ -5,8 +5,9 @@ const fs = require("fs");
 const SSLCommerzPayment = require('sslcommerz-lts');
 const app = express();
 const { MongoClient } = require('mongodb');
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 const cors = require('cors');
+
 const ObjectId = require('mongodb').ObjectId;
 require("dotenv").config();
 
@@ -57,6 +58,7 @@ async function run() {
         const rechargeCollection = client.db('vencap').collection("recharges");
 
         const withdrawCollection = client.db('vencap').collection("withdraw")
+        const complainCollection = client.db('vencap').collection("complains")
 
 
 
@@ -82,6 +84,21 @@ async function run() {
         //     const newProject = await projectCollection.insertOne(req.body);
         //     res.json(newProject);
         // })
+        //======= recommendation algorithm
+        app.post('/recommend', async (req, res) => {
+            const { userEmail, userInterests } = req.body;
+        
+            try {
+                const response = await axios.post('http://localhost:5001/recommend', {
+                    userEmail,
+                    userInterests,
+                });
+                res.json(response.data);
+            } catch (error) {
+                console.error('Error fetching recommendations:', error.message);
+                res.status(500).json({ error: 'Failed to fetch recommendations' });
+            }
+        });
         app.post("/projects", upload.single("image"), async (req, res) => {
             try {
               const projectData = {
@@ -244,8 +261,8 @@ async function run() {
                 total_amount: parseFloat(withdrawInfo.amount),
                 currency: 'BDT',
                 tran_id: newTransactionId, // use unique tran_id for each api call
-                success_url: `http://localhost:5000/withdraw/success/${newTransactionId}`,
-                fail_url: `http://localhost:5000/withdraw/fail/${newTransactionId}`,
+                success_url: `http://localhost:5001/withdraw/success/${newTransactionId}`,
+                fail_url: `http://localhost:5001/withdraw/fail/${newTransactionId}`,
                 cancel_url: 'http://localhost:3030/cancel',
                 ipn_url: 'http://localhost:3030/ipn',
                 shipping_method: 'Courier',
@@ -343,8 +360,8 @@ async function run() {
                 total_amount: parseFloat(rechargeInfo.amount),
                 currency: 'BDT',
                 tran_id: newTransactionId,
-                success_url: `http://localhost:5000/recharge/success/${newTransactionId}`,
-                fail_url: `http://localhost:5000/recharge/fail/${newTransactionId}`,
+                success_url: `http://localhost:5001/recharge/success/${newTransactionId}`,
+                fail_url: `http://localhost:5001/recharge/fail/${newTransactionId}`,
                 cancel_url: 'http://localhost:3030/cancel',
                 ipn_url: 'http://localhost:3030/ipn',
                 shipping_method: 'Courier',
@@ -430,19 +447,79 @@ async function run() {
             res.redirect("http://localhost:5173/my-profile");
         });
         //================multer start here=====
-        // Endpoint for file upload
-        app.post("/upload", upload.single("image"), (req, res) => {
-            if (!req.file) {
-                return res.status(400).send("No file uploaded.");
-            }
-            res.send({ filePath: `http://localhost:5000/uploads/${req.file.filename}` });
-        });
+      
+       
 
+        
         // Static folder to serve uploaded files
         app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
         //==============multer ends here========
 
+        // ====== Update User Verification =====
+        app.post('/user/updateUserVerified', async (req, res) => {
+            const { userEmail} = req.body;
+        
+            try {
+                // Find the user by email and update the interests
+                const updatedUser = await userCollection.findOneAndUpdate(
+                    { email: userEmail }, // Find user by email
+                    { $set: { isVerified: true } }, // Set new interests
+                    { new: true } // Return updated document
+                );
+        
+                if (!updatedUser) {
+                    return res.status(404).json({ error: 'User not found' });
+                }
+                else{
+                    return res.status(200).json({message:"User Update Successfully"});
+                }
+                
+            } catch (error) {
+                console.error('Error updating user:', error.message);
+                res.status(500).json({ error: 'Failed to update user' });
+            }
+        });
+        //======= post a complain
+        app.post('/complain', async (req, res) => {
+            console.log(req.body)
+          
+            try {
+              // Assuming you have a Complaint model in your database
+              const newComplain = await complainCollection.insertOne(req.body);
+              return res.status(200).json({message:"Complain Sent Successfully!"});
+           
+            } catch (error) {
+              console.error('Error saving complaint:', error.message);
+              res.status(500).json({ error: 'Failed to submit complaint' });
+            }
+          });
+        //======= get all complains
+        app.get("/complains", async (req, res) => {
+            const complains = await complainCollection.find({}).toArray();
+            res.json(complains);
+        })
+        //======= get  complain by user email by query(?)
+        app.get("/complains/user", async (req, res) => {
+            const userComplains = await complainCollection.find({ userEmail: req.query.email }).toArray();
+            res.json(userComplains);
+        })
+
+        //========= return investment logic is not fully implamented yet
+        app.post('/returnInvestment', async (req, res) => {
+            const { userEmail, userInterests } = req.body;
+        
+            try {
+                const response = await axios.post('http://localhost:5001/recommend', {
+                    userEmail,
+                    userInterests,
+                });
+                res.json(response.data);
+            } catch (error) {
+                console.error('Error fetching recommendations:', error.message);
+                res.status(500).json({ error: 'Failed to fetch recommendations' });
+            }
+        });
     }
     finally {
 

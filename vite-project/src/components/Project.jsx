@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { currencyFormatter } from '../utilities/others';
 
 const Project = ({ project }) => {
-    const { _id,title, amount, equity, image, valuation } = project;
+    const { _id,title, amount, equity, image, valuation,interest } = project||{};
 
 
 const navigate=useNavigate()
@@ -24,8 +24,8 @@ const navigate=useNavigate()
             <div className='single-project-card-image-container' onClick={handleNavigateToProjectDetailPage}>
                 <img 
                 
-                // src={image===undefined?`https://ui-avatars.com/api/?name=${title}`:`http://localhost:5000${image}`} 
-                src={image === undefined||image===null ? `https://ui-avatars.com/api/?name=${title}` : `http://localhost:5000${image}`}
+                // src={image===undefined?`https://ui-avatars.com/api/?name=${title}`:`http://localhost:5001${image}`} 
+                src={image === undefined||image===null ? `https://ui-avatars.com/api/?name=${title}` : `http://localhost:5001${image}`}
                 className="card-img-top single-project-image" 
                 height={400} 
                 alt={title} />
@@ -41,7 +41,9 @@ const navigate=useNavigate()
                     {/* Amount, Equity, Valuation */}
                     Amount:<strong>  {currencyFormatter.format(amount)} </strong><br />
                     Equity:<strong> {equity} %</strong> <br />
+                    Interest:<strong> {interest?interest:"20"} %</strong> <br />
                     Valuation:<strong> {currencyFormatter.format(valuation)}</strong>
+                    
                 </p>
             </div>
         </div>
@@ -57,6 +59,7 @@ Project.propTypes = {
         equity: PropTypes.number.isRequired,
         image: PropTypes.string.isRequired,
         valuation: PropTypes.number.isRequired,
+        interest: PropTypes.number.isRequired,
         // Add more PropTypes as per your project object structure
     }).isRequired,
 };

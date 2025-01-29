@@ -15,7 +15,7 @@ function valuationCal(e,a) {
     useEffect(() => {
         // Fetching project data for each investment
         console.log(project.projectId)
-        axios.get(`http://localhost:5000/project/${project?.projectId}`).then(res=>console.log(res))
+        axios.get(`http://localhost:5001/project/${project?.projectId}`).then(res=>console.log(res))
      console.log(projectDetails)
     }, [project,setProjectDetails,projectDetails]);
    

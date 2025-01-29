@@ -3,13 +3,31 @@ import axios from 'axios';
 import Project from './Project';
 import useAuth from '../hooks/useAuth';
 import { textColor } from '../utilities/color';
-
+const getRecommendations = async (userEmail) => {
+    const userInterests = JSON.parse(localStorage.getItem('userInterests')) || {};
+    console.log(userEmail,userInterests)
+    try {
+        const response = await axios.post('http://localhost:5001/recommend', { userEmail, userInterests });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching recommendations:', error.message);
+        return [];
+    }
+};
 const RecommendedProjects = () => {
     const [recommendedProjects, setRecommendedProjects] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const {user}=useAuth();
+    
     useEffect(() => {
+        
+        // const fetchRecommendations = async () => {
+        //     const recs = await getRecommendations(user?.email);
+        //     setRecommendedProjects(recs || []);
+        // };
+
+        // fetchRecommendations();
         const fetchRecommendedProjects = async () => {
             try {
                 const userInterests = JSON.parse(localStorage.getItem('userInterests')) || {};
@@ -17,7 +35,7 @@ const RecommendedProjects = () => {
                 // console.log(userCategories)
                 const categoryPreference = Object.keys(userCategories).sort((a, b) => userCategories[b] - userCategories[a]);
 
-                const response = await axios.get('http://localhost:5000/projects');
+                const response = await axios.get('http://localhost:5001/projects');
                 let projects = response.data;
 
                 projects.sort((a, b) => {

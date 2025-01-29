@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import  { useEffect, useState } from 'react';
 import axios from 'axios';
 import {  useNavigate } from 'react-router-dom';
@@ -14,7 +15,7 @@ const {user}=useAuth();
 
 // console.log(projects)
     useEffect(() => {
-        axios.get('http://localhost:5000/projects')
+        axios.get('http://localhost:5001/projects')
             .then(response => {
                 setProjects(response?.data?.filter(project=>project?.ownersInfo?.email===user?.email));
             //    (projects.map(project=>project?.investorsInfo?.map(investor=>console.log(investor))))

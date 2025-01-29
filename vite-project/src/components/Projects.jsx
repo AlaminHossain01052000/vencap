@@ -1,9 +1,11 @@
+/* eslint-disable no-undef */
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Project from './Project';
 import EachPageBanner from '../utilities/EachPageBanner';
 import PropTypes from 'prop-types';
 import useAuth from '../hooks/useAuth';
+import pf from '../utilities/pf';
 
 const Projects = () => {
     const [projects, setProjects] = useState([]);
@@ -18,8 +20,12 @@ const Projects = () => {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/projects');
-                setProjects(response.data);
+                const response = await axios.get('http://localhost:5001/projects');
+                setProjects(response.data.filter(obj => {
+                    const minimumReturnDate = new Date(obj.minimumReturnDate);
+                    const today = new Date();
+                    return pf(obj.equity) > 0 && minimumReturnDate > today;
+                  }));
                 setLoading(false);
             } catch (error) {
                 setError(error.message);

@@ -8,7 +8,7 @@ const HomeNavbar1 = () => {
   const [userPhoto,setUserPhoto]=useState('');
   const {logoutUser,user,admin}=useAuth();
   useEffect(()=>{
-    axios.get(`http://localhost:5000/users/single?email=${user?.email}`).then(res=>setUserPhoto(res?.data?.photo))
+    axios.get(`http://localhost:5001/users/single?email=${user?.email}`).then(res=>setUserPhoto(res?.data?.photo))
     console.log(user)
   },[user])
 
@@ -49,8 +49,15 @@ const HomeNavbar1 = () => {
         <li className="nav-item">
           <Link className="nav-link" to="/my-projects">My Projects</Link>
         </li>
+        
         <li className="nav-item">
           <Link className="nav-link" to="/my-investments">My Investments</Link>
+        </li>
+        <li className="nav-item">
+          <Link className="nav-link" to="/user-verification">User Verification</Link>
+        </li>
+        <li className="nav-item">
+          <Link className="nav-link" to="/complain-form">Complain Form</Link>
         </li>
         </>
       
@@ -66,7 +73,7 @@ const HomeNavbar1 = () => {
         <li className="nav-item dropdown">
           <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <img 
-            src={userPhoto===undefined||userPhoto===null?`https://ui-avatars.com/api/?name=${user?.name}`:`http://localhost:5000${userPhoto}`} 
+            src={userPhoto===undefined||userPhoto===null?`https://ui-avatars.com/api/?name=${user?.name}`:`http://localhost:5001${userPhoto}`} 
             alt="user-photo" width={15} />
             
           </a>
@@ -74,6 +81,7 @@ const HomeNavbar1 = () => {
             <ul className="dropdown-menu">
             <li className="home-navar-dropdown-menu-list"><Link className="dropdown-item " to="/my-profile">My Profile</Link></li>
             <li className="home-navar-dropdown-menu-list"><Link className="dropdown-item " to="/addNewProject">Add New Project</Link></li>
+            <li className="home-navar-dropdown-menu-list"><Link className="dropdown-item " to="/my-complains">My Complaints</Link></li>
             <li className="home-navar-dropdown-menu-list"><a className="dropdown-item " onClick={handleLogginOut}>Logout</a></li>
           </ul>
         

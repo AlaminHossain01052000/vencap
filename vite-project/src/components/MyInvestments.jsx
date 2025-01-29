@@ -6,30 +6,25 @@ import useAuth from '../hooks/useAuth';
 
 import EachPageBanner from '../utilities/EachPageBanner';
 import MyInvestment from './MyInvestment';
+import getRemainingDays from '../utilities/calculateRemainingDays';
 
 const MyInvestments = () => {
 
     const {user}=useAuth();
     const [myinvests,setMyInvests]=useState([]);
+    const [myPreviousInvestes,setMyPreviousInvestes]=useState([]);
  
    
     useEffect(() => {
         // Fetching project data for each investment
-        axios.get(`http://localhost:5000/users/single?email=${user?.email}`).then(res=>setMyInvests(res?.data?.myinvests))
-        // const fetchProjectsData = async () => {
-        //     try {
-        //         const projectDataPromises = user.myinvests.map(async (investment) => {
-        //             const response = await axios.get(`http://localhost:5000/project/${investment.projectId}`);
-        //             return { ...response.data, amount: investment.amount, equity: investment.equity };
-        //         });
-        //         const projectsData = await Promise.all(projectDataPromises);
-        //         setInvestments(projectsData);
-        //     } catch (error) {
-        //         console.error('Error fetching projects:', error);
-        //     }
-        // };
+        axios.get(`http://localhost:5001/users/single?email=${user?.email}`)
+        .then(res => {
+            const myInvests = res?.data?.myinvests || [];
+            setMyInvests(myInvests.filter(obj => getRemainingDays(obj) > 0));
+            setMyPreviousInvestes(myInvests.filter(obj => getRemainingDays(obj) === 0));
+          })
 
-        // fetchProjectsData();
+    
     }, [user]);
 
 // console.log(myinvests)
@@ -66,7 +61,39 @@ const MyInvestments = () => {
             </Table>
         </div>
     }
-    {/* <Footer/> */}
+            {myPreviousInvestes?.length>0&&
+            <div>
+        <h1 className='py-4 text-center'>Your Previous Investments</h1>
+        
+        <div className="container" >
+           
+            <Table striped bordered hover responsive>
+                <thead  className='text-center'>
+                    <tr>
+                        <th>No.</th>
+                        <th>Project Title</th>
+                        <th>Amount</th>
+                        <th>Equity</th>
+                        <th>Valuation</th>
+                        <th>Expected Return Date</th>
+                        
+                        <th>Profit</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    {myPreviousInvestes?.map((project,index) => (
+                        
+                        <MyInvestment key={index} project={project} index={index}/>
+                        
+                    ))}
+                </tbody>
+            </Table>
+        </div>
+        </div>
+
+    }
+    
         </div>
         
    

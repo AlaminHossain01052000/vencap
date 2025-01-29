@@ -17,7 +17,7 @@ const ViewProject = () => {
 
     const fetchProjects = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/projects');
+            const response = await axios.get('http://localhost:5001/projects');
             setProjects(response.data);
         } catch (error) {
             console.error("There was an error fetching the projects!", error);
@@ -28,7 +28,7 @@ const ViewProject = () => {
         const confirmDelete = window.confirm("Are you sure you want to delete this project?");
         if (confirmDelete) {
             try {
-                await axios.delete(`http://localhost:5000/projects/${id}`);
+                await axios.delete(`http://localhost:5001/projects/${id}`);
                 setProjects(projects.filter(project => project._id !== id));
             } catch (error) {
                 console.error("There was an error deleting the project!", error);

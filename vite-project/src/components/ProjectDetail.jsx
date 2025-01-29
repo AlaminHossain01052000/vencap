@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 
 import axios from 'axios';
 import PropTypes from 'prop-types';
@@ -26,19 +27,19 @@ const ProjectDetail = () => {
     const navigate = useNavigate();
     const location = useLocation()
     //    console.log(id);
-    const { title, description, image, valuation, amount, equity, minimumEquityBuy, additionTime, minimumReturnDate, ownersInfo, investorsInfo, category } = project || {};
+    const { title, description, image, valuation, amount, equity, minimumEquityBuy, additionTime, minimumReturnDate, ownersInfo, investorsInfo, category ,interest} = project || {};
     // console.log(project)
     useEffect(() => {
         const getProjectFunction = async () => {
-            await axios.get(`http://localhost:5000/project/${id}`).then(response => setProject(response.data))
+            await axios.get(`http://localhost:5001/project/${id}`).then(response => setProject(response.data))
 
         }
         const getUserProfileFunction = async () => {
             
-            await axios.get(`http://localhost:5000/users/single?email=${user?.email}`).then(response => setUserProfile(response?.data))
+            await axios.get(`http://localhost:5001/users/single?email=${user?.email}`).then(response => setUserProfile(response?.data))
         }
         const getOwnerFunction = async () => {
-            await axios.get(`http://localhost:5000/users/single?email=${ownersInfo?.email}`).then(response => setOwner(response?.data))
+            await axios.get(`http://localhost:5001/users/single?email=${ownersInfo?.email}`).then(response => setOwner(response?.data))
         }
         const getIconClassNameFunction = () => {
             setIconClassName(categoryToCorrespondingIcon[category?.toLowerCase()])
@@ -76,6 +77,10 @@ const ProjectDetail = () => {
             alert("Not sufficient balance");
             return;
         }
+        if (userProfile?.isVerified===false||userProfile?.isVerified===undefined) {
+            alert("You Have to Verify at First");
+            return;
+        }
         if (pf(equityValue) >= pf(minimumEquityBuy) && pf(equityValue) <= pf(equity)) {
             const newEquity = parseFloat(equity) - parseFloat(equityValue)
             const newAmount = (parseFloat(amount) * (parseFloat(equity) - parseFloat(equityValue))) / parseFloat(equity);
@@ -83,7 +88,8 @@ const ProjectDetail = () => {
             const newMinimumEquity = Math.min(parseFloat(minimumEquityBuy), parseFloat(newEquity));
             try {
                 setUpdateLoading(true)
-                const reponse = await axios.put("http://localhost:5000/projects", {
+                // eslint-disable-next-line no-unused-vars
+                const reponse = await axios.put("http://localhost:5001/projects", {
                     projectId: id,
                     newEquity,
                     newInvestorsInfo: investorsInfo?.map(investor => {
@@ -134,10 +140,10 @@ const ProjectDetail = () => {
                 // console.log(myinvests?)
                 const userBalance = pf(userProfile?.balance) - pf(userHaveToInvest)
                 if (myinvests.length > 0) {
-                    await axios.put("http://localhost:5000/users/investment", { email: user?.email, myinvests, userBalance })
+                    await axios.put("http://localhost:5001/users/investment", { email: user?.email, myinvests, userBalance })
 
                 }
-                await axios.put("http://localhost:5000/users/getinvestment", { email: owner?.email, newBalance: pf(owner?.balance) + pf(userHaveToInvest) })
+                await axios.put("http://localhost:5001/users/getinvestment", { email: owner?.email, newBalance: pf(owner?.balance) + pf(userHaveToInvest) })
             } catch (error) {
                 setUpdateLoading(false)
                 alert(error.message)
@@ -160,7 +166,7 @@ const ProjectDetail = () => {
             <div className="container mt-5">
                 <div>
                     {/* Project image */}
-                    <img src={image === undefined||image===null ? `https://ui-avatars.com/api/?name=${title}` : `http://localhost:5000${image}`} alt={title} className='w-100' style={{ height: "600px" }} />
+                    <img src={image === undefined||image===null ? `https://ui-avatars.com/api/?name=${title}` : `http://localhost:5001${image}`} alt={title} className='w-100' style={{ height: "600px" }} />
                     <div className='d-flex justify-content-center mt-5'>
                         <div className='project-detail-description w-75'>
                             <div className='d-flex flex-column'>
@@ -193,6 +199,7 @@ const ProjectDetail = () => {
                                                 Amount: <strong className='fw-bold'>{currencyFormatter.format(amount)}</strong> <br />
                                                 Equity: <strong className='fw-bold'>{equity} %</strong> <br />
                                                 Minimum Equity to Buy: <strong className='fw-bold'>{minimumEquityBuy} %</strong> <br />
+                                                Interest: <strong className='fw-bold'>{interest?interest:"20"} %</strong> <br />
                                                 Added Date:<strong className='fw-bold'> {`${date.getFullYear()}-${String(date?.getMonth() + 1)?.padStart(2, '0')}-${String(date?.getDate())?.padStart(2, '0')}`} </strong><br />
                                                 Minimum Return Date: <strong className='fw-bold'>{minimumReturnDate}</strong> <br />
                                                 Owners Email: <strong className='fw-bold'>{ownersInfo?.email}</strong><br />
