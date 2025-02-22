@@ -26,10 +26,12 @@ function App() {
 
   return (
     <>
-    
+        <div id="recaptcha-container"></div>
     <AuthProvider>
     
     <BrowserRouter>
+
+
     <HomeNavbar1/>
         <Routes>
           <Route path='/' Component={Home} />

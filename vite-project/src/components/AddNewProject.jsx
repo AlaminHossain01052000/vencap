@@ -15,7 +15,7 @@ const AddNewProject = () => {
     equity: 0,
     amount: 0,
     valuation: 0,
-    minimumEquityBuy: 0,
+   
     ownersInfo: {},
     investorsInfo: [],
     category: '',
@@ -55,12 +55,8 @@ const AddNewProject = () => {
       return;
     }
 
-    // Check if minimumEquityBuy is greater than or equal to equity
-    else if (parseFloat(formData.minimumEquityBuy) > parseFloat(formData.equity)) {
-      setError('Minimum Equity Buy must be less than or equal to the total equity.');
-      return;
-    }
-    else if(formData.equity>100||formData.equity<0||formData.amount<=0||formData.minimumEquityBuy<=0){
+    
+    else if(formData.equity>100||formData.equity<0||formData.amount<=0){
         setError("Please Enter a valid Number")
         return;
     }
@@ -84,7 +80,7 @@ const AddNewProject = () => {
    try {
     projectData.equity=pf(projectData.equity);
     projectData.amount=pf(projectData.amount);
-    projectData.minimumEquityBuy=pf(projectData.minimumEquityBuy);
+    
     projectData.valuation=pf(projectData.valuation);
 
     //  await axios.post('http://localhost:5001/projects', projectData);
@@ -101,7 +97,7 @@ const AddNewProject = () => {
       equity: 0,
       amount: 0,
       valuation: 0,
-      minimumEquityBuy: 0,
+      
       ownersInfo: {},
       investorsInfo: [],
       category: '',
@@ -188,18 +184,7 @@ const AddNewProject = () => {
               required
             />
           </div>
-          <div className="form-group mb-3">
-            <label style={{color:'#001140'}} htmlFor="minimumEquityBuy">Minimum Equity Buy (%)</label>
-            <input
-              type="number"
-              className="form-control"
-              id="minimumEquityBuy"
-              name="minimumEquityBuy"
-              value={formData.minimumEquityBuy}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          
           <div className="form-group mb-3">
             <label style={{color:'#001140'}} htmlFor="interset">Interest (%)</label>
             <input

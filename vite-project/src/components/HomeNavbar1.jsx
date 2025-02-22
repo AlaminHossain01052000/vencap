@@ -54,9 +54,6 @@ const HomeNavbar1 = () => {
           <Link className="nav-link" to="/my-investments">My Investments</Link>
         </li>
         <li className="nav-item">
-          <Link className="nav-link" to="/user-verification">User Verification</Link>
-        </li>
-        <li className="nav-item">
           <Link className="nav-link" to="/complain-form">Complain Form</Link>
         </li>
         </>
@@ -82,6 +79,7 @@ const HomeNavbar1 = () => {
             <li className="home-navar-dropdown-menu-list"><Link className="dropdown-item " to="/my-profile">My Profile</Link></li>
             <li className="home-navar-dropdown-menu-list"><Link className="dropdown-item " to="/addNewProject">Add New Project</Link></li>
             <li className="home-navar-dropdown-menu-list"><Link className="dropdown-item " to="/my-complains">My Complaints</Link></li>
+            <li className="home-navar-dropdown-menu-list"><Link className="dropdown-item " to="/user-verification">User Verification</Link></li>
             <li className="home-navar-dropdown-menu-list"><a className="dropdown-item " onClick={handleLogginOut}>Logout</a></li>
           </ul>
         

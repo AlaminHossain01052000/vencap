@@ -55,7 +55,7 @@ Project.propTypes = {
 
         _id:PropTypes.string.isRequired,
         title: PropTypes.string.isRequired,
-        amount: PropTypes.number.isRequired,
+        amount: PropTypes.number.isRequired||PropTypes.string.isRequired,
         equity: PropTypes.number.isRequired,
         image: PropTypes.string.isRequired,
         valuation: PropTypes.number.isRequired,

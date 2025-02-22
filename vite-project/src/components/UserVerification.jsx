@@ -79,6 +79,7 @@ const {user}=useAuth();
         }
         else{
           setError(result.result);
+          aletrt(result.result);
 
         }
       } else {

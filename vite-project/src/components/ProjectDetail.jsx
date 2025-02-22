@@ -27,7 +27,7 @@ const ProjectDetail = () => {
     const navigate = useNavigate();
     const location = useLocation()
     //    console.log(id);
-    const { title, description, image, valuation, amount, equity, minimumEquityBuy, additionTime, minimumReturnDate, ownersInfo, investorsInfo, category ,interest} = project || {};
+    const { title, description, image, valuation, amount, equity,  additionTime, minimumReturnDate, ownersInfo, investorsInfo, category ,interest} = project || {};
     // console.log(project)
     useEffect(() => {
         const getProjectFunction = async () => {
@@ -81,11 +81,10 @@ const ProjectDetail = () => {
             alert("You Have to Verify at First");
             return;
         }
-        if (pf(equityValue) >= pf(minimumEquityBuy) && pf(equityValue) <= pf(equity)) {
+        if (pf(equityValue) <= pf(equity)) {
             const newEquity = parseFloat(equity) - parseFloat(equityValue)
             const newAmount = (parseFloat(amount) * (parseFloat(equity) - parseFloat(equityValue))) / parseFloat(equity);
             const newValuation = (newAmount * 100) / (newEquity)
-            const newMinimumEquity = Math.min(parseFloat(minimumEquityBuy), parseFloat(newEquity));
             try {
                 setUpdateLoading(true)
                 // eslint-disable-next-line no-unused-vars
@@ -107,7 +106,7 @@ const ProjectDetail = () => {
                     ),
                     newAmount,
                     newValuation,
-                    newMinimumEquity
+                   
                 })
                 // /users/investment
                 const myinvests = []
@@ -198,7 +197,7 @@ const ProjectDetail = () => {
                                                 Valuation: <strong className='fw-bold'> {currencyFormatter.format(valuation)}</strong> <br />
                                                 Amount: <strong className='fw-bold'>{currencyFormatter.format(amount)}</strong> <br />
                                                 Equity: <strong className='fw-bold'>{equity} %</strong> <br />
-                                                Minimum Equity to Buy: <strong className='fw-bold'>{minimumEquityBuy} %</strong> <br />
+                                                
                                                 Interest: <strong className='fw-bold'>{interest?interest:"20"} %</strong> <br />
                                                 Added Date:<strong className='fw-bold'> {`${date.getFullYear()}-${String(date?.getMonth() + 1)?.padStart(2, '0')}-${String(date?.getDate())?.padStart(2, '0')}`} </strong><br />
                                                 Minimum Return Date: <strong className='fw-bold'>{minimumReturnDate}</strong> <br />
@@ -254,7 +253,7 @@ ProjectDetail.propTypes = {
         image: PropTypes.string.isRequired,
         valuation: PropTypes.number.isRequired,
         description: PropTypes.string.isRequired,
-        minimumEquityBuy: PropTypes.number.isRequired,
+        
         addedDate: PropTypes.string.isRequired,
         minimumReturnDate: PropTypes.string.isRequired,
         ownersEmail: PropTypes.string.isRequired

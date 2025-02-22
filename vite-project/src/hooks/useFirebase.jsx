@@ -1,4 +1,5 @@
-import { getAuth, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, signInWithEmailAndPassword, getIdToken ,deleteUser as firebaseDeleteUser} from "firebase/auth";
+/* eslint-disable no-undef */
+import { getAuth, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, signInWithEmailAndPassword, getIdToken ,deleteUser as firebaseDeleteUser,sendEmailVerification, signInWithPhoneNumber,RecaptchaVerifier } from "firebase/auth";
 import { useEffect, useState } from "react";
 import initializeFirebase from "../utilities/firebase.init";
 import axios from "axios";
@@ -12,52 +13,72 @@ const useFirebase = () => {
     const [admin,setAdmin]=useState(false)
     const [token, setToken] = useState("");
     const auth = getAuth();
-   
-    const registerNewUser =async (userInfo, navigate) => {
+    // auth.languageCode = 'it';
+
+    const registerNewUser = async (userInfo, navigate) => {
         setLoading(true);
-        const {email,password}=userInfo||{}
-        await createUserWithEmailAndPassword(auth, email, password)
-            .then(() => {
-                // const newUser = { name: name, email: userInfo.email };
-                setUser(user);
-                updateProfile(auth.currentUser).then(() => {
-                    // Set User Display Name
-
-                }).catch((error) => {
-                    // An error occurred At the time of setting user displayName
-                    setError(error);
-
+        setError(null);
+    
+        const { email, password } = userInfo || {};
+    
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+    
+            if (user) {
+                // Update Profile
+                await updateProfile(user, { displayName: userInfo.name });
+    
+                // Send Email Verification
+                await sendEmailVerification(user);
+                alert("A verification email has been sent. Please check your inbox and verify your email.");
+                await auth.signOut();
+                // Store user info in the database
+                await axios.post("http://localhost:5001/users", { ...userInfo, balance: 0 }, {
+                    headers: { "Content-Type": "application/json" }
                 });
-                 axios.post('http://localhost:5001/users', {...userInfo,balance:0}, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                  });
-                // axios.post('http://localhost:5001/users', {...userInfo,balance:0})
-                setLoading(false)
-                navigate("/");
-            })
-            .catch((error) => {
-
-
-                setError(error.message);
-            })
-            .finally(() => setLoading(false))
-            ;
-    }
-    const loginUser = (email, password, navigate, location) => {
-        setLoading(true);
-        signInWithEmailAndPassword(auth, email, password)
-            .then(() => {
-                setError("");
-                console.log(location);
-                const redirect_url = location?.state?.from?.pathname || "/";
-                console.log(redirect_url);
-                navigate(redirect_url, { replace: true });
-            })
-            .catch((error) => {
-                setError(error.message);
-            })
-            .finally(() => setLoading(false));
+    
+                // Set user state
+                setUser(user);
+    
+                // Navigate after successful registration
+                navigate("/login");
+            }
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
     };
+    
+    const loginUser = async (email, password, navigate, location,fromOtp=false) => {
+        setLoading(true);
+        setError("");
+    
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+    
+            // Check if email is verified
+            if (!user?.emailVerified) {
+                setError("Please verify your email before logging in.");
+                await auth.signOut(); // Prevent unverified users from staying logged in
+                return;
+            }
+            if(fromOtp)return;
+            // Redirect user after successful login
+            // console.log(location)
+            const redirect_url ="/";
+            // console.log(redirect_url)
+            navigate(redirect_url, { replace: true });
+    
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
    
     const logoutUser = () => {
         setLoading(true);
@@ -99,10 +120,71 @@ const useFirebase = () => {
             setLoading(false);
         }
     }
+    const initializeRecaptcha = () => {
+        try {
+            if (!window.recaptchaVerifier) {
+                window.recaptchaVerifier = new RecaptchaVerifier(
+                    auth,
+                    "recaptcha-container",
+                    {
+                        size: "invisible",
+                        callback: (response) => {
+                            console.log("reCAPTCHA verified", response);
+                        },
+                        "expired-callback": () => {
+                            console.log("reCAPTCHA expired");
+                        },
+                    }
+                );
+                // window.recaptchaVerifier.render(); // Ensure it's properly attached
+            }
+        } catch (error) {
+            console.error("Recaptcha initialization error:", error);
+        }
+    };
+    const handleSendOtp = async (setConfirmResult,phoneNumber) => {
+       
+        setLoading(true);
+        setError("");
+
+        try {
+            
+            initializeRecaptcha();
+            const appVerifier = await window.recaptchaVerifier;
+            // console.log(appVerifier)
+            const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber,appVerifier);
+            setConfirmResult(confirmationResult);
+            // console.log(confirmationResult)
+            alert("OTP sent to your mobile number!");
+        } catch (error) {
+            setError(error.message);
+            console.log(error.message)
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleVerifyOtp = async (confirmResult,verificationCode,email,password,navigate,location) => {
+        setLoading(true);
+        setError("");
+
+        try {
+            await confirmResult.confirm(verificationCode);
+            alert("Phone number verified successfully!");
+            await loginUser(email,password,navigate,location,true)
+
+            // Proceed with your application logic (e.g., redirect to the home page)
+        } catch (error) {
+            setError("Invalid OTP. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
     useEffect(() => {
         setLoading(true);
         onAuthStateChanged(auth, (user) => {
-            if (user) {
+            if (user&&user?.emailVerified) {
+                console.log(user.emailVerified)
                 // User is signed in, see docs for a list of available properties
                 // https://firebase.google.com/docs/reference/js/firebase.User
 
@@ -122,6 +204,7 @@ const useFirebase = () => {
             }
             setLoading(false);
         });
+        
     }, [auth])
     return {
         user,
@@ -133,7 +216,9 @@ const useFirebase = () => {
         loading,
         error,
         token,
-        deleteUser
+        deleteUser,
+        handleSendOtp,
+        handleVerifyOtp
     }
 }
 export default useFirebase;

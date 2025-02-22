@@ -7,6 +7,7 @@ import EachPageBanner from '../utilities/EachPageBanner';
 import pf from '../utilities/pf';
 import  emailjs  from '@emailjs/browser';
 import { currencyFormatter } from '../utilities/others';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 
 
@@ -14,10 +15,13 @@ const MyProfile = () => {
     const [profile, setProfile] = useState({});
     // const [openAmountField,setOpenAmountField]=useState(false);
     const [amount,setAmount]=useState(0);
-    
     // const [prevBalance,setPrevBalance]=useState(0);
-    const {user}=useAuth();
-    
+    const {user,handleSendOtp,handleVerifyOtp}=useAuth();
+    const [contactNoVerifyNowClicked,setContactNoVerifyNowClicked]=useState(false);
+    const [otp,setOtp]=useState('');
+    const [confirmResult,setConfirmResult]=useState(null)
+    const navigate=useNavigate();
+    const location=useLocation()
     useEffect(() => {
         // console.log(user)
          axios.get(`http://localhost:5001/users/single?email=${user?.email}`)
@@ -30,6 +34,7 @@ const MyProfile = () => {
                 console.error("There was an error fetching the profile data!", error);
             });
             emailjs.init("ExZoup8ZCGDP-bVZk");
+           
          
     }, [user,profile]);
     const sendEmail = () => {
@@ -160,8 +165,14 @@ const MyProfile = () => {
         // console.log('Recharge clicked');
     };
 
-    
-
+    const handleSendingOtp=()=>{
+        handleSendOtp(setConfirmResult,profile.contact)
+        setContactNoVerifyNowClicked(!contactNoVerifyNowClicked)
+    }
+    const invokeHandleVerifyOtp=()=>{
+        handleVerifyOtp(confirmResult,otp,profile.email,profile.password,navigate,location);
+        // console.log(confirmResult)
+    }
     return (
         <>
         
@@ -189,7 +200,23 @@ const MyProfile = () => {
                                 
                                 </h3>
                             <p className="card-text"><strong>Email:</strong> {profile?.email}</p>
-                            <p className="card-text"><strong>Contact No:</strong> {profile?.contact}</p>
+                            <div>
+
+                                <div  className='d-flex align-items-center'>
+                                
+                                <p className="card-text mt-3"><strong>Contact No:</strong> {profile?.contact}</p>
+                                {profile?.isContactVerified? <button className='btn btn-success ms-3 fw-bold' disabled>Verified</button>:
+                                <button className='btn btn-warning ms-3 fw-bold' onClick={handleSendingOtp}>{contactNoVerifyNowClicked?"Cancel":"Verify Now"}</button> }
+                                </div>
+                                {contactNoVerifyNowClicked&&
+                                <div>
+                                    <input placeholder='Enter Your OTP' type='number' style={{padding:"10px"}} onChange={(e)=>setOtp(e.target.value)}/>
+                                    <input type='submit' className='btn btn-danger ms-3' onClick={invokeHandleVerifyOtp}/>
+                                </div>
+                                }
+                               
+                                    
+                            </div>
                             <p className="card-text"><strong>Balance:</strong> {profile?.balance===null||profile?.balance===undefined?0:profile.balance}</p>
                             <div className='d-flex flex-column'>
                                 <div className='w-25'>
