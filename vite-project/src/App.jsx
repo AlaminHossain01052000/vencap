@@ -19,6 +19,7 @@ import Chat from './components/Chat'
 import UserVerification from './components/UserVerification'
 import Complain from './components/Complain'
 import MyComplains from './components/MyComplains'
+import ViewAllComplains from './components/ViewAllComplains'
 
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
           <Route path='/user-verification' Component={UserVerification} />
           <Route path='/complain-form' Component={Complain} />
           <Route path='/my-complains' Component={MyComplains} />
+          <Route path='/view-all-complains' Component={ViewAllComplains} />
           <Route path='/signup' Component={Signup} />
         </Routes>
       <Chat/>

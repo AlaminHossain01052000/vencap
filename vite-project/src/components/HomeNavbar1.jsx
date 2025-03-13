@@ -11,7 +11,6 @@ const HomeNavbar1 = () => {
     axios.get(`http://localhost:5001/users/single?email=${user?.email}`).then(res=>setUserPhoto(res?.data?.photo))
     console.log(user)
   },[user])
-
   // console.log(user)
   const handleLogginOut=()=>{
     // console.log("out")
@@ -41,6 +40,9 @@ const HomeNavbar1 = () => {
       </li>
       <li className="nav-item">
         <Link className="nav-link" to="/view-users">View Users</Link>
+      </li>
+      <li className="nav-item">
+        <Link className="nav-link" to="/view-all-complains">View Complains</Link>
       </li>
         </>
         :

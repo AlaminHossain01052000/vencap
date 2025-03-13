@@ -22,6 +22,7 @@ const is_live = false //true for live, false for sandbox
 
 // connecting node js with mongodb
 const uri = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.li11u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+// mongodb+srv://vencap:uyHEL5s2VqWIn45i@cluster0.li11u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 const client = new MongoClient(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -182,10 +183,10 @@ async function run() {
         // post a new user in database
         app.post("/users", upload.single("photo"), async (req, res) => {
             try {
-                console.log(req.file.filename)
+                
               const userInfo = {
                 ...req.body,
-                photo: req.file ? `/uploads/${req.file.filename}` : null, // Save the relative path to the image
+                photo: req?.file ? `/uploads/${req.file.filename}` : null, // Save the relative path to the image
               };
           
               const newUser = await userCollection.insertOne(userInfo);
@@ -503,6 +504,36 @@ async function run() {
         app.get("/complains/user", async (req, res) => {
             const userComplains = await complainCollection.find({ userEmail: req.query.email }).toArray();
             res.json(userComplains);
+        })
+
+        //======= update complain from resolved false to true
+        app.post("/complains/resolve/:id", async (req, res) => {
+            const { id } = req.params;
+        
+            try {
+                const updatedComplain = await complainCollection.findOneAndUpdate(
+                    { _id:  hex.test(id) ? new ObjectId(id) : id}, // Find the complain by ID
+                    { $set: { isResolved: true } }, // Set isResolved to true
+                    { upsert: false } // Return the updated document
+                );
+        
+                if (!updatedComplain) {
+                    return res.status(404).json({ error: "Complaint not found" });
+                }
+        
+                return res.status(200).json({ message: "Complaint resolved successfully", data: updatedUser });
+            } catch (error) {
+                console.error("Error updating complaint:", error.message);
+                res.status(500).json({ error: "Failed to update complaint" });
+            }
+        });
+        //====== delete a complain
+        // Delete complain
+        app.delete("/complains/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: hex.test(id) ? new ObjectId(id) : id };
+            const deletedComplain = await complainCollection.deleteOne(query);
+            res.json(deletedComplain);
         })
 
         //========= return investment logic is not fully implamented yet

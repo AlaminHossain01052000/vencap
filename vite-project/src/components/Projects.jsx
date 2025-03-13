@@ -5,7 +5,7 @@ import Project from './Project';
 import EachPageBanner from '../utilities/EachPageBanner';
 import PropTypes from 'prop-types';
 import useAuth from '../hooks/useAuth';
-import pf from '../utilities/pf';
+
 
 const Projects = () => {
     const [projects, setProjects] = useState([]);
@@ -21,11 +21,12 @@ const Projects = () => {
         const fetchProjects = async () => {
             try {
                 const response = await axios.get('http://localhost:5001/projects');
-                setProjects(response.data.filter(obj => {
-                    const minimumReturnDate = new Date(obj.minimumReturnDate);
-                    const today = new Date();
-                    return pf(obj.equity) > 0 && minimumReturnDate > today;
-                  }));
+                setProjects(response.data)
+                // setProjects(response.data.filter(obj => {
+                //     const minimumReturnDate = new Date(obj.minimumReturnDate);
+                //     const today = new Date();
+                //     return pf(obj.equity) > 0 && minimumReturnDate > today;
+                //   }));
                 setLoading(false);
             } catch (error) {
                 setError(error.message);
@@ -39,6 +40,7 @@ const Projects = () => {
 
     // Filter projects by search term, category, and sort by valuation
     useEffect(() => {
+        // console.log(projects)
         const filtered = projects.filter(project =>
             project?.title?.toLowerCase().includes(searchTerm.toLowerCase()) &&
             (selectedCategory === '' || project.category === selectedCategory)
@@ -51,7 +53,7 @@ const Projects = () => {
         } else if (sortByValuation === 'High to Low') {
             sortedProjects.sort((a, b) => b.valuation - a.valuation);
         }
-
+        // console.log(sortedProjects)
         setFilteredProjects(sortedProjects);
     }, [searchTerm, projects, selectedCategory, sortByValuation]);
 
@@ -140,7 +142,7 @@ const Projects = () => {
 };
 
 Projects.propTypes = {
-    userEmail: PropTypes.string.isRequired,
+    userEmail: PropTypes.string,
 };
 
 export default Projects;

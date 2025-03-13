@@ -62,6 +62,8 @@ const useFirebase = () => {
             // Check if email is verified
             if (!user?.emailVerified) {
                 setError("Please verify your email before logging in.");
+                await sendEmailVerification(user);
+                alert("A verification email has been sent. Please check your inbox and verify your email.");
                 await auth.signOut(); // Prevent unverified users from staying logged in
                 return;
             }

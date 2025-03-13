@@ -1,0 +1,26 @@
+/* Container styling for a soothing background and subtle shadow */
+.view-all-complains {
+    background-color: #f7f9fc; /* Light, soothing background color */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Header styling */
+  .view-all-complains h2 {
+    color: #333;
+    font-weight: 600;
+  }
+  
+  /* Table styling to keep a clean and gentle appearance */
+  .table {
+    background-color: #fff;
+    border-radius: 4px;
+  }
+  
+  /* Dark header with a subtle contrast */
+  .thead-dark th {
+    background-color: #343a40;
+    color: #fff;
+  }
+  
