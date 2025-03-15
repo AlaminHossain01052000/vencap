@@ -104,20 +104,27 @@ const MyProfile = () => {
                     balance:pf(profile.balance),
                     newBalance:pf(profile.balance)-pf(amount)
                 }
-                
             
             ).then(responseUrl=>{
+                
                 withdrawUrl=responseUrl.data.url
+                
                 sendEmail2()
+                
                 
             })
 
         } catch (error) {
             console.log(error)
         }
+        
         finally{
-            window.location.replace(withdrawUrl);
-        }
+            // console.log(withdrawUrl)
+            window.open(withdrawUrl)
+            // window.location.replace(withdrawUrl);
+
+            
+        }   
     };
     
     const handleRecharge = async() => {
@@ -155,7 +162,8 @@ const MyProfile = () => {
 
             }
             finally{
-                window.location.replace(rechargeUrl);
+                window.open(rechargeUrl)
+               
 
             }
             // console.log(response)
@@ -166,11 +174,13 @@ const MyProfile = () => {
     };
 
     const handleSendingOtp=()=>{
-        handleSendOtp(setConfirmResult,profile.contact)
+        if(!contactNoVerifyNowClicked)
+            handleSendOtp(setConfirmResult,profile.contact)
         setContactNoVerifyNowClicked(!contactNoVerifyNowClicked)
     }
     const invokeHandleVerifyOtp=()=>{
         handleVerifyOtp(confirmResult,otp,profile.email,profile.password,navigate,location);
+        
         // console.log(confirmResult)
     }
     return (
@@ -205,7 +215,7 @@ const MyProfile = () => {
                                 <div  className='d-flex align-items-center'>
                                 
                                 <p className="card-text mt-3"><strong>Contact No:</strong> {profile?.contact}</p>
-                                {profile?.isContactVerified? <button className='btn btn-success ms-3 fw-bold' disabled>Verified</button>:
+                                {profile?.isMobileVerified? <button className='btn btn-success ms-3 fw-bold' disabled>Verified</button>:
                                 <button className='btn btn-warning ms-3 fw-bold' onClick={handleSendingOtp}>{contactNoVerifyNowClicked?"Cancel":"Verify Now"}</button> }
                                 </div>
                                 {contactNoVerifyNowClicked&&
@@ -230,9 +240,9 @@ const MyProfile = () => {
 
                                 
                                 <div className='w-25 d-flex  flex-column justify-content-between mt-4'>   
-                                <button className="btn btn-primary mb-3" onClick={handleWithdraw} disabled={profile?.isVerified===false||profile?.isVerified===undefined}>Withdraw</button>
+                                <button className="btn btn-primary mb-3" onClick={handleWithdraw} disabled={profile?.isVerified===false||profile?.isVerified===undefined||profile?.isMobileVerified===undefined||profile?.isMobileVerified===false}>Withdraw</button>
                                 <button className="btn btn-success" onClick={handleRecharge} 
-                                 disabled={profile?.isVerified===false||profile?.isVerified===undefined}
+                                 disabled={profile?.isVerified===false||profile?.isVerified===undefined||profile?.isMobileVerified===undefined||profile?.isMobileVerified===false}
                                 >Recharge</button>
                                 </div>
                             </div>

@@ -481,6 +481,30 @@ async function run() {
                 res.status(500).json({ error: 'Failed to update user' });
             }
         });
+        // ====== Update User Mobile Verification =====
+        app.post('/user/updateUserMobileVerified', async (req, res) => {
+            const { userEmail} = req.body;
+        
+            try {
+                // Find the user by email and update the interests
+                const updatedUser = await userCollection.findOneAndUpdate(
+                    { email: userEmail }, // Find user by email
+                    { $set: { isMobileVerified: true } }, // Set new interests
+                    { new: true } // Return updated document
+                );
+        
+                if (!updatedUser) {
+                    return res.status(404).json({ error: 'User not found' });
+                }
+                else{
+                    return res.status(200).json({message:"User Update Successfully"});
+                }
+                
+            } catch (error) {
+                console.error('Error updating user:', error.message);
+                res.status(500).json({ error: 'Failed to update user' });
+            }
+        });
         //======= post a complain
         app.post('/complain', async (req, res) => {
             console.log(req.body)

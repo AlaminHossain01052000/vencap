@@ -174,10 +174,35 @@ const useFirebase = () => {
             await confirmResult.confirm(verificationCode);
             alert("Phone number verified successfully!");
             await loginUser(email,password,navigate,location,true)
-
+            try {
+                const response = await fetch('http://localhost:5001/user/updateUserMobileVerified', {
+                    method: 'POST', // Use POST method
+                    headers: {
+                        'Content-Type': 'application/json', // Send JSON data
+                    },
+                    body: JSON.stringify({
+                        userEmail:user.email,
+                        
+                    }), // Send user email and interests as JSON
+                });
+        
+                if (!response.ok) {
+                    throw new Error('Failed to update user');
+                }
+        
+                // const data = await response.json(); // Parse the JSON response
+                alert("User Contact Verified Successfully");
+                // console.log('User updated successfully:', data);
+                
+            } catch (error) {
+              setError(error);
+                console.error('Error updating user:', error);
+            }
+            // return 1;
             // Proceed with your application logic (e.g., redirect to the home page)
         } catch (error) {
-            setError("Invalid OTP. Please try again.");
+            alert(error)
+            // return -1;
         } finally {
             setLoading(false);
         }
