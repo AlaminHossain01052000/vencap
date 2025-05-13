@@ -35,6 +35,7 @@ Vencap is a comprehensive web-based platform that bridges the gap between projec
   * Lodge a complaint against other users using the complaint form.
   * View personal complaints and profile information.
   * Withdraw or recharge funds (available only for verified users).
+  * After each transaction (withdraw and recharge), a confirmation email is sent to the user.
   * Verification involves uploading NID (PDF) and taking a picture using a webcam.
   * Real-time facial recognition (Python-Flask) and OTP verification via mobile (Firebase).
   * Refund after the project deadline if applicable.
@@ -64,6 +65,7 @@ Vencap is a comprehensive web-based platform that bridges the gap between projec
   * React.js
   * Bootstrap
   * FontAwesome
+  * Email.js
 
 * **Backend**:
 
