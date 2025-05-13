@@ -20,11 +20,11 @@ const useFirebase = () => {
         setError(null);
     
         const { email, password } = userInfo || {};
-    
+        console.log(email)
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
-    
+            
             if (user) {
                 // Update Profile
                 await updateProfile(user, { displayName: userInfo.name });
@@ -145,7 +145,7 @@ const useFirebase = () => {
         }
     };
     const handleSendOtp = async (setConfirmResult,phoneNumber) => {
-       
+       console.log(phoneNumber)
         setLoading(true);
         setError("");
 
@@ -155,8 +155,8 @@ const useFirebase = () => {
             const appVerifier = await window.recaptchaVerifier;
             // console.log(appVerifier)
             const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber,appVerifier);
-            setConfirmResult(confirmationResult);
-            // console.log(confirmationResult)
+            await setConfirmResult(confirmationResult);
+            
             alert("OTP sent to your mobile number!");
         } catch (error) {
             setError(error.message);

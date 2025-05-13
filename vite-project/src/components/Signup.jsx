@@ -35,7 +35,9 @@ const navigate=useNavigate();
   };
 
   const handleSubmit = (e) => {
+   setCurrentError('')
     e.preventDefault();
+    console.log(error)
     if(error)setCurrentError(error);
     else if (!formData.name) {
       setCurrentError('User Name is required!');
@@ -51,10 +53,12 @@ const navigate=useNavigate();
       setCurrentError('');
       // Add photo generation logic using name if photo is empty
       formData.photo=file;
+      console.log(formData)
       if (!formData.photo) {
+        
         formData.photo = `https://ui-avatars.com/api/?name=${formData.name}`;
         formData.date=new Date()
-      // console.log(formData)
+      
         
       registerNewUser(formData,navigate);
 

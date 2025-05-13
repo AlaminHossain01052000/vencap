@@ -122,11 +122,11 @@ async function run() {
                 // Construct filter and update objects
                 const filter = { _id: new ObjectId(req.body.projectId) };
                 const updatedDocument = {
-                    equity: req.body.newEquity.toString(), // Ensure equity is a string if needed
+                    equity: req.body?.newEquity?.toString(), // Ensure equity is a string if needed
                     investorsInfo: req.body.newInvestorsInfo,
-                    amount: req.body.newAmount.toString(), // Ensure amount is a string if needed
+                    amount: req.body?.newAmount?.toString(), // Ensure amount is a string if needed
                     valuation: parseFloat(req.body.newValuation),
-                    minimumEquityBuy: req.body.newMinimumEquity.toString()
+                    minimumEquityBuy: req.body?.newMinimumEquity?.toString()
                 };
                 // console.log(updatedDocument);
 
